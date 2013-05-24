@@ -1,0 +1,114 @@
+html {
+	height: 100%;
+}
+
+.full-height {
+	height: 100%;
+}
+
+.prefix {
+	margin-left: 0 !important;
+}
+
+.margin-top-bottom {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.border-none {
+	border-radius: 0px;
+}
+
+.text-left {
+	text-align: left
+}
+.text-center {
+	text-align: center
+}
+.text-right {
+	text-align: right
+}
+
+.sidebar .left-side {
+	margin-top: 80px;
+}
+
+.sidebar {
+	padding: 10px 0;
+	background-color: #f5f5f5;
+	border: 1px solid #DDD;
+}
+.sidebar h1,
+.sidebar h5,
+.sidebar .nav li a {
+	padding-left: 30px;
+}
+.sidebar .nav {
+	border: none;
+}
+.sidebar .nav li:not(.active):first-child {
+	border-top: 1px solid #DDD;
+}
+.sidebar .nav li:not(.active) {
+	border-bottom: 1px solid #DDD;
+}
+.sidebar .nav li a {
+	margin-bottom: 0;
+}
+.sidebar .nav li.active a {
+	border-left: 0;
+}
+
+#content h3 {
+	margin: 0 20px 0;
+}
+#content hr {
+	margin: 10px 0;
+}
+
+.drop-area {
+	position: absolute;
+}
+.drop-area p {
+	display: none;
+}
+.drop-area.over {
+	border: 2px dashed #000;
+	background-color: rgba(255, 255, 255, 0.75);
+}
+.drop-area.over p {
+	display: block;
+	position: absolute;
+	top: 45%;
+	font-size: 30px;
+	font-weight: bold;
+	color: #000;
+}
+
+#drop-logo {
+	width: 210px;
+	height: 90px;
+	top: 0;
+	left: 20px;
+}
+#drop-logo p {
+	font-size: 18px;
+	left: 16%;
+}
+#drop-background {
+	width: 810px;
+	height: 336px;
+	top: 0;
+}
+#drop-background p {
+	left: 30%;
+}
+#drop-price-1 {
+	width: 340px;
+	height: 140px;
+	top: 175px;
+	left: 450px;
+}
+#drop-price-1 p {
+	left: 18%;
+}

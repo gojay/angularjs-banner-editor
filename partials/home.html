@@ -1,0 +1,106 @@
+<div class="span3 prefix">
+	<aside class="tabbable tabs-left">
+		<div id="templates">
+			<h5>Default Templates</h5>
+			<div class="tabbable tabs-left">
+				<ul class="nav nav-tabs span12">
+					<li class="active"><a href="#svg-tpl-1" data-toggle="tab" data-tpl="tpl-1">Template 1</a></li>
+					<li><a href="#svg-tpl-2" data-toggle="tab" data-tpl="tpl-2">Template 2</a></li>
+					<li><a href="#svg-tpl-3" data-toggle="tab" data-tpl="tpl-3">Template 3</a></li>
+				</ul>
+			</div>
+		</div>
+		<button class="btn btn-primary" ng-click="doSetting($event)">Settings</button>
+		<button class="btn hide" ng-click="cancelTemplate($event)">Cancel</button>
+		<div id="settings" class="hide">
+			<form class="form-horizontal">
+				<fieldset>
+					<legend>Background</legend>
+					<div class="control-group">
+						<label class="control-label" style="width: 100px; text-align:left;">Background</label>
+						<div class="controls" style="margin-left: 100px;">
+							<input type="file" id="input-background" class="hide" />
+						</div>
+					</div>
+					<legend>Logo</legend>
+					<div class="control-group">
+						<label class="control-label" style="width: 125px; text-align:left;">Select an image</label>
+						<div class="controls" style="margin-left: 125px;">
+							<input type="file" id="input-logo" class="hide" />
+						</div>
+					</div>
+					<legend>Prizes</legend>
+					<div class="control-group" ng-show="tplShowPrice >= 1">
+						<label class="control-label" style="width: 125px; text-align:left;">Select an image</label>
+						<div class="controls" style="margin-left: 125px;">
+							<input type="file" id="input-price-1" class="hide" />
+						</div>
+					</div>
+					<div class="control-group" ng-show="tplShowPrice >= 2">
+						<label class="control-label" style="width: 125px; text-align:left;">Select an image</label>
+						<div class="controls" style="margin-left: 125px;">
+							<input type="file" id="input-price-2" class="hide" />
+						</div>
+					</div>
+					<div class="control-group" ng-show="tplShowPrice >= 3">
+						<label class="control-label" style="width: 125px; text-align:left;">Select an image</label>
+						<div class="controls" style="margin-left: 125px;">
+							<input type="file" id="input-price-3" class="hide" />
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" style="width: 100%; text-align:left;">Resize</label>
+						<div class="controls" style="margin-left: 0;">
+							<input type="number" id="input-logo-width" class="input-small" placeholder="width" ng-model="logo.w" /> X 
+							<input type="text" id="input-logo-height" class="input-small" placeholder="height" ng-model="logo.h" />
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="controls" style="margin-left: 0;">
+							<input type="checkbox" ng-click="addWhitePlaceholder($event)" /> Add Placeholder
+						</div>
+					</div>
+					<legend>Text</legend>
+					<div class="control-group">
+						<div class="controls" style="margin-left: 0;">
+							<input type="text" class="input-xlarge" ng-model="title">
+							<p class="help-block text-right">Limit : {{counterTitle}}/{{counterOfTitle}}</p>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="controls" style="margin-left: 0;">
+							<textarea class="input-xlarge" ng-model="description" placeholder="Enter content description here.." rows="8"></textarea>
+							<p class="help-block text-right">Limit : {{counterDescription}}/{{counterOfDescription}}</p>
+						</div>
+					</div>
+					<div class="control-group" ng-show="tplShowPrice >= 1">
+						<label>Price 1</label>
+						<div class="controls" style="margin-left: 0;">
+							<textarea class="input-xlarge" ng-model="price.one.text" placeholder="Enter Price description here.." rows="4"></textarea>
+							<p class="help-block text-right">Limit : {{price.one.counter}}/{{price.one.limit}}</p>
+						</div>
+					</div>
+					<div class="control-group" ng-show="tplShowPrice >= 2">
+						<label>Price 2</label>
+						<div class="controls" style="margin-left: 0;">
+							<textarea class="input-xlarge" ng-model="price.two.text" placeholder="Enter Price description here.." rows="4"></textarea>
+							<p class="help-block text-right">Limit : {{price.two.counter}}/{{price.two.limit}}</p>
+						</div>
+					</div>
+					<div class="control-group" ng-show="tplShowPrice >= 3">
+						<label>Price 3</label>
+						<div class="controls" style="margin-left: 0;">
+							<textarea class="input-xlarge" ng-model="price.three.text" placeholder="Enter Price description here.." rows="4"></textarea>
+							<p class="help-block text-right">Limit : {{price.three.counter}}/{{price.three.limit}}</p>
+						</div>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</aside>
+</div>
+<div class="span9" style="position: relative">
+	
+	<background-editor title="title" description="description" price="price" logo="logo"></background-editor>
+
+</div>
