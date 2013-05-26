@@ -29,6 +29,10 @@ html {
 	text-align: right
 }
 
+.container > hr {
+	margin: 40px 0;
+}
+
 .sidebar .left-side {
 	margin-top: 80px;
 }
@@ -66,17 +70,17 @@ html {
 	margin: 10px 0;
 }
 
+/* drop element */
+
 .drop-area {
 	position: absolute;
-}
-.drop-area p {
-	display: none;
 }
 .drop-area.over {
 	border: 2px dashed #000;
 	background-color: rgba(255, 255, 255, 0.75);
 }
-.drop-area.over p {
+.drop-area.over:after {
+	content: attr(data-title);
 	display: block;
 	position: absolute;
 	top: 45%;
@@ -86,29 +90,41 @@ html {
 }
 
 #drop-logo {
-	width: 210px;
-	height: 90px;
-	top: 0;
-	left: 20px;
+	width: 200px;
+	height: 100px;
+	top: 100px;
+	left: 30px;
 }
-#drop-logo p {
+#drop-logo.over:after {
 	font-size: 18px;
 	left: 16%;
 }
 #drop-background {
 	width: 810px;
-	height: 336px;
-	top: 0;
+	height: 381px;
+	top: 60px;
 }
-#drop-background p {
+#drop-background.over:after {
 	left: 30%;
 }
 #drop-price-1 {
-	width: 340px;
-	height: 140px;
-	top: 175px;
-	left: 450px;
+	width: 345px;
+	height: 188px;
+	top: 263px;
+	left: 445px;
 }
-#drop-price-1 p {
+#drop-price-1.over:after {
 	left: 18%;
+}
+
+.accordion-inner input[type="text"]:not(.input-small),
+.accordion-inner textarea {
+	width: 94%;
+}
+
+input[type="checkbox"] ~ label {
+	display: inline;
+	padding-left: 5px;
+	position: relative;
+	top: 3px;
 }

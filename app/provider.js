@@ -51,41 +51,46 @@ angular.module('BannerProvider', [])
 						dropArea      : '#drop-area',
 						inputFileEl   : '#input-file',
 						inputFileText : 'Upload File',
-						section	: 'background',
-						changeEl  : null,
-						compile : null
+						section       : 'background',
+						changeEl      : null,
+						compile       : null
 					};
-					// auto merge default options
+
+					/* auto merging default options */
+
 					var config = self.config = $.extend({}, defaults, options);
 
-					// create button file for better input file
+					/* create better input file with the button element */
 
-					// create button input file ID
+					// create the button input file ID
 					var buttonFileId = config.inputFileEl + '-button';
-					// check button input file is created
-					if($(buttonFileId).length) return;
-					// check input file is visible, set hidden if visible
+					// check the button input file
+					if($(buttonFileId).length) $(buttonFileId).remove();
 					if($(config.inputFileEl).is(':visible')) $(config.inputFileEl).addClass('hide');
-					// create button field
+					// create the button input file
 					var buttonField = document.createElement('button');
 					buttonField.setAttribute('id', buttonFileId.replace(/\#/, ''));
 					buttonField.setAttribute('class', 'btn');
 					buttonField.innerHTML = config.inputFileText;
+					// append child
 					$(config.inputFileEl).parent().prepend(buttonField);
-					// event button file 
+					// the button file event
 					$(buttonFileId).click(function() {
 						$(config.inputFileEl).click();
 					});
+					self.config['buttonEl'] = buttonField;
 
-					// event input file 
+					/* input file event */
 
 					$(config.inputFileEl).bind('change', {config : config}, function(evt){
-						var file = evt.target.files[0];
+						var file   = evt.target.files[0];
 						var config = evt.data.config;
+						console.log('config',config);
+						console.log('change',file);
 						self.handleReadImage(file, config);
 					});
 
-					// drag n drop events
+					/* drag n drop events */
 
 					$(config.dropArea)
 						// event drop 
@@ -128,6 +133,7 @@ angular.module('BannerProvider', [])
 				handleReadImage: function(file, config){
 					if (!file.type.match('image.*')) return;
 
+					var buttonEl = config.buttonEl;
 					var changeEl = config.changeEl;
 					var fr     = new FileReader();
 					fr.onload = function(e) {
@@ -136,13 +142,12 @@ angular.module('BannerProvider', [])
 						var image = new Image();
 						image.onload = function(){
 							console.log(image.width, image.height);
-							/*console.log('is price ', /price/.test(config.section));
-							if(! /price/.test(config.section) ){
+							/*if(! /price/.test(config.section) ){
 								changeEl.setAttribute('xlink:href', e.target.result);
 								changeEl.setAttribute('width', image.width);
 								changeEl.setAttribute('height', image.height);
 							}*/
-							if( config.compile ) config.compile(changeEl, image);
+							if( config.compile ) config.compile(buttonEl, changeEl, image);
 						};
 						image.src = e.target.result;
 					};

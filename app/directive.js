@@ -4,7 +4,7 @@
  * Description
  */
 angular.module('BannerComponents', [])
-	.directive('backgroundEditor', function(imageReader){
+	.directive('bannerEditor', function(imageReader){
 		// Runs during compile
 		return {
 			scope: {
@@ -12,52 +12,23 @@ angular.module('BannerComponents', [])
 				description : '=',
 				price : '=',
 				logo : '=',
-				isEditor : '='
+				banner : '='
 			}, // {} = isolate, true = child, false/undefined = no change
 			restrict: 'EAC', // E = Element, A = Attribute, C = Class, M = Comment
-			templateUrl: 'partials/components/background-editor.html',
-			// replace: true,
-			// transclude: true,
-			// compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, elm, attrs){}})),
+			templateUrl: 'partials/components/banner-editor.html',
+			replace: true,
 			link: function($scope, iElm, iAttrs, controller) {
-
-				// imageReader.init({
-				// 	dropArea      : '#drop-background',
-				// 	inputFileEl   : '#input-background',
-				// 	inputFileText : 'Add Background'
-				// });
-				// imageReader.init({
-				// 	dropArea      : '#drop-area',
-				// 	inputFileEl   : '#input-logo',
-				// 	inputFileText : 'Add Logo'
-				// });
-				// imageReader.init({
-				// 	dropArea      : '#drop-area',
-				// 	inputFileEl   : '#input-price-1',
-				// 	inputFileText : 'Add Price 1'
-				// });
-				// imageReader.init({
-				// 	dropArea      : '#drop-area',
-				// 	inputFileEl   : '#input-price-2',
-				// 	inputFileText : 'Add Price 2'
-				// });
-				// imageReader.init({
-				// 	dropArea      : '#drop-area',
-				// 	inputFileEl   : '#input-price-3',
-				// 	inputFileText : 'Add Price 3'
-				// });
-
 				// http://www.daniweb.com/web-development/threads/421183/saving-mathml-rendered-to-canvas-as-png
 				// http://damien.antipa.at/2013/03/01/thoughts-on-rendering-html-markup-into-an-image-or-canvas/
 				// http://people.mozilla.org/~roc/rendering-HTML-elements-to-canvas.html
-				$scope.convert2 = function(evt) {
+/*				$scope.convert2 = function(evt) {
 
 					var svg = $('#svg-editor svg')[0],
-    					img = document.querySelector('img'),
-    					canvas = document.querySelector('canvas'),
-    					ctx = canvas.getContext("2d");
+						img = document.querySelector('img'),
+						canvas = document.querySelector('canvas'),
+						ctx = canvas.getContext("2d");
 
-    				$(img).hide();
+					$(img).hide();
 
 					var svgxml = (new XMLSerializer).serializeToString(svg);
 					var svgDataImage = new Blob([svgxml], {
@@ -65,10 +36,10 @@ angular.module('BannerComponents', [])
 					});
 					var DOMURL = (window.URL || window.webkitURL);
 					var url = DOMURL.createObjectURL(svgDataImage);
-					img.onload = function(){
+					img.onload = function() {
 						ctx.drawImage(img, 0, 0, img.width, img.height);
-    					DOMURL.revokeObjectURL(url);
-    					// window.open(canvas.toDataURL('image/png'));
+						DOMURL.revokeObjectURL(url);
+						// window.open(canvas.toDataURL('image/png'));
 					};
 					img.src = url;
 
@@ -86,45 +57,53 @@ angular.module('BannerComponents', [])
 							}
 						});
 				};
-
+*/
 				$scope.convert = function(evt){
-
-					var svg = $('#svg-editor svg')[0];
+					// get svg n convert foreignobject to xml
+					var svg     = $('#svg-editor > svg')[0];
 					var svg_xml = (new XMLSerializer()).serializeToString(svg);
+					// get canvas dimensions
 					var canvasDimensions = JSON.parse($('input[name="canvasDimensions"]').val());
-					var canvas = document.createElement('canvas');
-					var ctx = canvas.getContext("2d");
+					// create canvas
+					var canvas    = document.createElement('canvas');
 					canvas.width  = canvasDimensions.width;
 					canvas.height = canvasDimensions.height;
-					var downloadLink = document.createElement('a');
-					// $('body').css('height', '800px')
+					// get canvas context
+					var ctx = canvas.getContext("2d");
 					$.blockUI({
 						timeout: 3000,
-						message: '<h2>Please wait...</h2>',
+						message: $('#loading-problem'),
 						css: {
-							top: '50%',
-							border: '3px solid #a00'
+							background : 'transparent',
+							border     : 'none',
+							top        : ($(window).height() - 350) / 2 + 'px',
+							left       : ($(window).width() - 375) / 2 + 'px',
+							width      : '350px'
 						},
-						onUnblock: function() { 
+						onUnblock: function() {
 							// Base64-encode the XML as data URL
 							var img = new Image();
 							img.onload = function(){
+								// drawing canvas image
 								ctx.drawImage(img, 0, 0);
+								// convert canvas to datauri
 								var imgDataURI = canvas.toDataURL('image/png');
-								downloadLink.title = 'Download banner';
-								downloadLink.href = imgDataURI;
-								downloadLink.target = '_blank';
+								// create anchor element
+								var downloadLink       = document.createElement('a');
+								downloadLink.title     = 'Download banner';
+								downloadLink.href      = imgDataURI;
+								downloadLink.target    = '_blank';
 								downloadLink.className = 'btn btn-success';
 								downloadLink.innerHTML = 'Download banner';
-								downloadLink.download = 'banner.png';
+								downloadLink.download  = 'banner.png';
+								// append canvas n anchor
 								iElm.append(canvas);
 								iElm.append(downloadLink);
 								// window.open(canvas.toDataURL('image/png'));
 							};
 							img.src = "data:image/svg+xml;base64," + btoa(svg_xml);
-			            }
+						}
 					});
-
 
 					/*svg.toDataURL("image/png", {
 						callback: function(data) {
@@ -134,58 +113,64 @@ angular.module('BannerComponents', [])
 					});*/
 				};
 
-				$('body').bind('bgReposition', function(e, canvasDimensions){
-					var $svg = $('#svg-editor > svg');
-					var imageReposition = $('image.bg', $svg)[0];
-					var maxW = imageReposition.getAttribute('width') - canvasDimensions.width,
-						maxH = imageReposition.getAttribute('height') - canvasDimensions.height,
-						x = imageReposition.getAttribute('x'),
-						y = imageReposition.getAttribute('y');
-
+				$('body').bind('bgReposition', function(e, data){
+					// define svg & image background element
+					var $svg = data.svg;
+					var imageBgEl = $('image.bg', $svg)[0];
+					// get image background dimension
+					var w = parseInt(imageBgEl.getAttribute('width')),
+						h = parseInt(imageBgEl.getAttribute('height'));
+					// get different size with canvas
+					var maxW = parseInt(w - data.canvasDimensions.width),
+						maxH = parseInt(h - data.canvasDimensions.height);
+					// helper
+					var toggleEl = (data.type == 3) ? '#logo, #description' : '#logo, #description, #price' ;
+					var top, x, y = 0;
+					// set draggable element
 					var $bgDraggable = $('#background > rect', $svg).eq(0);
-					console.log('$bgDraggable', $bgDraggable[0]);
+					// init draggable
 					$bgDraggable.draggable({
-	                    cursor: "move",
+						cursor: "move",
+						containment: [0, 0, 810, 381],
 						start: function(e, ui) {
-							$('#logo', $svg).hide();
-							$('#description', $svg).hide();
-							$('#price', $svg).hide();
-							console.log('start', ui.position);
-							console.log('start', x, y);
-							ui.position.top = y;
-							ui.position.left = x;
-	                    },
-	                    drag: function(event, ui) {
+							// hidden elements while dragging
+							$(toggleEl, $svg).hide();
+							$('#background > rect', $svg).eq(1).hide();
+							x = parseInt(imageBgEl.getAttribute('x'));
+							y = parseInt(imageBgEl.getAttribute('y'));
+							// set start top position
+							top = ui.position.top;
+						},
+						drag: function(event, ui) {
 							var pos = ui.position;
-							var newX = (pos.left > 0) ? 0 : (Math.abs(pos.left) > maxW) ? -Math.abs(maxW) : pos.left;
-							var newY = (pos.top > 0) ? 0 : (Math.abs(pos.top) > maxH) ? -Math.abs(maxH) : pos.top;
-							imageReposition.setAttribute('x',newX);
-							imageReposition.setAttribute('y',newY);
-							console.log(pos);
-	                    },
-	                    stop: function(event, ui) {
-							console.log('stop', ui.position);
-							x = ui.position.left;
-							y = ui.position.top;
-							$('#logo', $svg).show();
-							$('#description', $svg).show();
-							$('#price', $svg).show();
-	                    }
-	                });
+							// calculate left n top, continues current position
+							var calcLeft = x + pos.left;
+							var calcTop  = y + (pos.top - top);
+							// set max position
+							var newX = (calcLeft > 0) ? 0 : (calcLeft < -maxW) ? -maxW : calcLeft;
+							var newY = (calcTop > 0) ? 0 : (calcTop < -maxH) ? -maxH : calcTop;
+							// set attribute position
+							imageBgEl.setAttribute('x', newX);
+							imageBgEl.setAttribute('y', newY);
+						},
+						stop: function(event, ui) {
+							// show elements after dragging
+							$(toggleEl, $svg).show();
+							$('#background > rect', $svg).eq(1).show();
+						}
+					});
 				});
 
-				$scope.reposition = function(evt){
+				$scope.doBGReposition = function(evt){
 					console.log('reposition', evt.currentTarget);
 					var $button = $(evt.currentTarget);
 					var $dropEl = $('#drop-background');
 					if($dropEl.is(':hidden')){
 						$dropEl.show();
 						$button.html('<i class="icon-move"></i> Background Reposition');
-						$('#background-image').draggable('disable');
 					} else {
 						$dropEl.hide();
 						$button.html('<i class="icon-ok"></i> Done');
-						$('#background-image').draggable('enable');
 					}
 				};
 			}
