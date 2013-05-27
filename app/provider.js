@@ -40,7 +40,7 @@ angular.module('BannerProvider', [])
 						case 'background':
 							options.changeEl = {
 								like  : $svg_like.find('image#background-image-editor-like')[0],
-								enter : $svg_enter.find('image#background-image-editor-enter')[0],
+								enter : $svg_enter.find('image#background-image-editor-enter')[0]
 							};
 							break;
 						case 'price-1':
@@ -71,6 +71,8 @@ angular.module('BannerProvider', [])
 						changeEl      : null,
 						compile       : null
 					};
+
+					console.log('options', options);
 
 					/* auto merging default options */
 

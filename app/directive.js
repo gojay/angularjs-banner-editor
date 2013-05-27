@@ -18,46 +18,7 @@ angular.module('BannerComponents', [])
 			templateUrl: 'partials/components/banner-editor.html',
 			replace: true,
 			link: function($scope, iElm, iAttrs, controller) {
-				// http://www.daniweb.com/web-development/threads/421183/saving-mathml-rendered-to-canvas-as-png
-				// http://damien.antipa.at/2013/03/01/thoughts-on-rendering-html-markup-into-an-image-or-canvas/
-				// http://people.mozilla.org/~roc/rendering-HTML-elements-to-canvas.html
-/*				$scope.convert2 = function(evt) {
-
-					var svg = $('#svg-editor svg')[0],
-						img = document.querySelector('img'),
-						canvas = document.querySelector('canvas'),
-						ctx = canvas.getContext("2d");
-
-					$(img).hide();
-
-					var svgxml = (new XMLSerializer).serializeToString(svg);
-					var svgDataImage = new Blob([svgxml], {
-						type: "image/svg+xml;charset=utf-8"
-					});
-					var DOMURL = (window.URL || window.webkitURL);
-					var url = DOMURL.createObjectURL(svgDataImage);
-					img.onload = function() {
-						ctx.drawImage(img, 0, 0, img.width, img.height);
-						DOMURL.revokeObjectURL(url);
-						// window.open(canvas.toDataURL('image/png'));
-					};
-					img.src = url;
-
-					$('body')
-						.block({
-							timeout: 3000,
-							message: '<h1>Processing</h1>',
-							css: {
-								top: '50%',
-								border: '3px solid #a00'
-							},
-							onUnblock: function() {
-								$('#convert-result').css('height', 'auto');
-								$(img).show();
-							}
-						});
-				};
-*/
+				// SVG to dataURI
 				$scope.convert = function(evt){
 					// get svg n convert foreignobject to xml
 					var svg     = $('#svg-editor > svg')[0];
@@ -104,15 +65,9 @@ angular.module('BannerComponents', [])
 							img.src = "data:image/svg+xml;base64," + btoa(svg_xml);
 						}
 					});
-
-					/*svg.toDataURL("image/png", {
-						callback: function(data) {
-							img.setAttribute("src", data);
-							// window.open(data);
-						}
-					});*/
 				};
 
+				// binding background reposition
 				$('body').bind('bgReposition', function(e, data){
 					// define svg & image background element
 					var $svg      = data.svg;
@@ -165,11 +120,11 @@ angular.module('BannerComponents', [])
 					});
 				});
 
+				// start background reposition
 				$scope.doBGReposition = function(evt){
-					console.log('reposition', evt.currentTarget);
-					var $button = $(evt.currentTarget);
+					var $button  = $(evt.currentTarget);
 					var $svgLast = $('#svg-editor > svg#svg-editor-enter');
-					var $dropEl = $('#drop-background');
+					var $dropEl  = $('.drop-area');
 					if($dropEl.is(':hidden')){
 						$dropEl.fadeIn('slow');
 						$svgLast.show();

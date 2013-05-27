@@ -8,7 +8,7 @@ angular.module('BannerControllers', [])
 		// banner model
 		$scope.banner = {
 			title : {
-				text    : 'Company Title',
+				text    : 'Company Name, Company Contest, Contest',
 				limit   : 50,
 				counter : 50
 			},
@@ -24,17 +24,17 @@ angular.module('BannerControllers', [])
 			},
 			price : {
 				one: {
-					text   : 'Enter price 1 description...',
+					text   : 'Enter price 1 description',
 					limit  : 75,
 					counter: 75
 				},
 				two: {
-					text    : 'Enter price 2 description...',
+					text    : 'Enter price 2 description',
 					limit   : 75,
 					counter : 75
 				},
 				three: {
-					text    : 'Enter price 3 description...',
+					text    : 'Enter price 3 description',
 					limit   : 75,
 					counter : 75
 				}
@@ -82,7 +82,7 @@ angular.module('BannerControllers', [])
 			$(this).fadeOut(400, function(){
 				$(this).hide();
 				$('.tab-content').hide();
-				$(this).next().removeClass('renew');
+				$(this).next().removeClass('overwrite');
 				$(this).siblings('#cancelTpl').hide();
 				$(this).siblings('#settings').show();
 				$('#svg-editor').show();
@@ -117,7 +117,7 @@ angular.module('BannerControllers', [])
 		};
 
 		$scope.overwiriteTplYes = function(evt){
-			$('#overwriteAlert').trigger('renew');
+			$('#alert-overwrite').trigger('overwrite');
 		};
 		$scope.overwiriteTplNo = function(evt){
 			$('.blockOverlay').click();
@@ -151,36 +151,33 @@ angular.module('BannerControllers', [])
 				tplShowPrice : tplShowPrice
 			};
 
-			// clear the svg editor
-			if($btnTemplate.hasClass('renew')){
-				$('#overwriteAlert').bind('renew', function(){
+			// alert overwrite
+			if($btnTemplate.hasClass('overwrite')){
+				$('#alert-overwrite').bind('overwrite', function(){
 					var self = this;
 					$('.blockOverlay').click();
 					bannerSetting(settings, true);
-					$(self).unbind('renew');
 				});
+				// show message
 				$.blockUI({
-					message: $('#overwriteAlert'),
+					message: $('#alert-overwrite'),
 					css: {
 						background : 'transparent',
 						border     : 'none',
-						top        : ($(window).height() - 239) / 2 + 'px',
-						left       : ($(window).width() - 379) / 2 + 'px',
-						width      : '397px'
+						top        : ($(window).height() - 479) / 2 + 'px',
+						left       : ($(window).width() - 649) / 2 + 'px',
+						width      : '649px'
 					}
 				});
 				$('.blockOverlay').attr('title','Click to cancel').click($.unblockUI);
 				return;
-				// $btnTemplate.removeClass('renew');
-				// $settingField.find('form')[0].reset();
-				// $svgEditor.html('');
 			}
 			// return to the templates
 			if($templateField.is(':hidden')){
 				$btnCancel.show();
 				$actEditor.hide();
 				$templateField.fadeIn(400, function(){
-					$btnTemplate.addClass('renew').text('Settings');
+					$btnTemplate.addClass('overwrite').text('Settings');
 					$contentField.show();
 					$settingField.hide();
 					$svgEditor.hide();
@@ -191,7 +188,7 @@ angular.module('BannerControllers', [])
 			bannerSetting(settings, false);
 		};
 
-		var bannerSetting = function( options, renew, callback ){
+		var bannerSetting = function( options, overwrite ){
 			var $tpl          = options.field.template;
 			var $settingField = options.field.setting;
 			var $tplContent   = options.field.content;
@@ -201,10 +198,13 @@ angular.module('BannerControllers', [])
 			var $editorAction = options.editor.action;
 			var tplShowPrice  = options.tplShowPrice;
 
-			if( renew ){
-				$editorSVG.html('');
-				$btnTemplate.removeClass('renew');
-				$settingField.find('form')[0].reset();
+			if( overwrite ){
+				// remove class overwrite
+				$btnTemplate.removeClass('overwrite');
+				// clear all setting input file
+				$('input[type="file"]', $settingField).each(function(e,i){
+					$(this).val('');
+				});
 			}
 
 			// canvas dimensions
@@ -212,13 +212,15 @@ angular.module('BannerControllers', [])
 			// compile SVG (inject scope)
 			var $svg = getSVGCompiled($tplContent, 'like', tplShowPrice);
 			var $svg2 = getSVGCompiled($tplContent, 'enter', tplShowPrice);
-			$tpl.fadeOut(400, function(){
+			$tpl.hide(400, function(){
 				$(this).hide();
 				$tplContent.hide();
 				$btnCancel.hide();
 				$btnTemplate.text('Choose template');
 
-				$settingField.fadeIn(function(){
+				$settingField.show(400,function(){
+					// clear editor
+					$editorSVG.html('');
 					// append svg
 					$editorSVG.append($svg);
 					$editorSVG.append($svg2);
@@ -354,7 +356,13 @@ angular.module('BannerControllers', [])
 						}
 					});
 
-					if(callback) callback();
+					// centering header text price
+					var $text  = $('#price > text', $svg2);
+					var $tspan = $text.find('tspan');
+					// calculate new x position
+					var newX = parseInt(($text.width() - $tspan.width()) / 2) + parseInt($text[0].getAttribute('x'));
+					// set x position
+					$tspan[0].setAttribute('x',newX);
 				});
 			});
 		}
@@ -407,12 +415,7 @@ angular.module('BannerControllers', [])
 			$('#price', $svg).children().map(function(i,e){
 				if($(e).attr('id') === undefined) return;
 				if(type == 'enter') {
-					var oldX = $('#price > text', $svg)[0].getAttribute('x'), x = 0;
-					if(tplIndex == 1) x = parseInt(oldX) + 37;
-					else if(tplIndex == 2) x = parseInt(oldX) + 47;
-					else if(tplIndex == 3) x = parseInt(oldX) + 57;
 					$('#price > text > tspan', $svg).text('Enter to Win!');
-					$('#price > text > tspan', $svg)[0].setAttribute('x',x);
 				}
 				$(e).attr('id', function(index, id){
 					return id.replace(/(\d+)/, function(fullMatch, n) {
@@ -426,7 +429,6 @@ angular.module('BannerControllers', [])
 		$scope.cancelTemplate = function($event){
 			$('#templates').trigger('cancelTemplate');
 		};
-
 
 		$scope.addWhitePlaceholder = function(event){
 			var $placeholder = $(event.currentTarget);
