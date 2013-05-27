@@ -6,11 +6,14 @@
 				<li class="active"><a href="#svg-tpl-1" data-toggle="tab" data-tpl="tpl-1">Template 1</a></li>
 				<li><a href="#svg-tpl-2" data-toggle="tab" data-tpl="tpl-2">Template 2</a></li>
 				<li><a href="#svg-tpl-3" data-toggle="tab" data-tpl="tpl-3">Template 3</a></li>
+				<li><a href="#svg-tpl-4" data-toggle="tab" data-tpl="tpl-4">Template 4</a></li>
+				<li><a href="#svg-tpl-5" data-toggle="tab" data-tpl="tpl-5">Template 5</a></li>
+				<li><a href="#svg-tpl-6" data-toggle="tab" data-tpl="tpl-6">Template 6</a></li>
 			</ul>
 		</div>
 	</div>
 	<button class="btn btn-primary" ng-click="doSetting($event)">Settings</button>
-	<button class="btn hide" ng-click="cancelTemplate($event)">Cancel</button>
+	<button id="cancelTpl" class="btn hide" ng-click="cancelTemplate($event)">Cancel</button>
 	<div id="settings" class="hide margin-top-bottom">
 		<form class="form-horizontal">
 			<fieldset>
@@ -141,12 +144,12 @@
 			</fieldset>
 		</form>
 	</div>
-	<div id="question" style="display:none; float: left; width: 397px; height: 239px; position: relative; background: url('images/ragecomic2-transparent.png') no-repeat; background-position: -1px -241px; font-size: 16px;"> 
+	<div id="overwriteAlert" style="display:none; float: left; width: 397px; height: 239px; position: relative; background: url('images/ragecomic2-transparent.png') no-repeat; background-position: -1px -241px; font-size: 16px;"> 
 		<div class="message" style="position: absolute;right: 15px;top: 49px; width: 200px;height: 108px;">
 		    <p style="font-weight: bold; padding: 10px 10px 0;">Are u sure ? really ? really ?</p> 
 		    <p class="text-center" style="padding: 0 10px;">
-		    <button class="yes btn" ng-click="yes($event)">Yes</button>
-		    <button class="no btn" ng-click="no($event)">No</button>
+		    <button class="yes btn" ng-click="overwiriteTplYes($event)">Yes</button>
+		    <button class="no btn" ng-click="overwiriteTplNo($event)">No</button>
 		    </p>
 		</div>
 	</div> 

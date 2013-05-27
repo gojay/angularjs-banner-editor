@@ -28,22 +28,38 @@ angular.module('BannerProvider', [])
 				init: function(options){
 					var self = this;
 
-					var $svg = $('#svg-editor > svg');
+					var $svg_like  = $('#svg-editor > svg').eq(0);
+					var $svg_enter = $('#svg-editor > svg').eq(1);
 					switch(options.section){
 						case 'logo':
-							options.changeEl = $svg.find('image#logo-image-editor')[0];
+							options.changeEl = {
+								like  : $svg_like.find('image#logo-image-editor-like')[0],
+								enter : $svg_enter.find('image#logo-image-editor-enter')[0]
+							};
 							break;
 						case 'background':
-							options.changeEl = $svg.find('image.bg')[0];
+							options.changeEl = {
+								like  : $svg_like.find('image#background-image-editor-like')[0],
+								enter : $svg_enter.find('image#background-image-editor-enter')[0],
+							};
 							break;
 						case 'price-1':
-							options.changeEl = $svg.find('image#price-image-editor-1')[0];
+							options.changeEl = {
+								like  : $svg_like.find('image#price-image-editor-like-1')[0],
+								enter : $svg_enter.find('image#price-image-editor-enter-1')[0]
+							};
 							break;
 						case 'price-2':
-							options.changeEl = $svg.find('image#price-image-editor-2')[0];
+							options.changeEl = {
+								like  : $svg_like.find('image#price-image-editor-like-2')[0],
+								enter : $svg_enter.find('image#price-image-editor-enter-2')[0]
+							};
 							break;
 						case 'price-3':
-							options.changeEl = $svg.find('image#price-image-editor-3')[0];
+							options.changeEl = {
+								like  : $svg_like.find('image#price-image-editor-like-3')[0],
+								enter : $svg_enter.find('image#price-image-editor-enter-3')[0]
+							};
 							break;
 					}
 

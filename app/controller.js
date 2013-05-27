@@ -8,7 +8,7 @@ angular.module('BannerControllers', [])
 		// banner model
 		$scope.banner = {
 			title : {
-				text    : 'Company Name, Contest Title, Contest',
+				text    : 'Company Title',
 				limit   : 50,
 				counter : 50
 			},
@@ -78,6 +78,17 @@ angular.module('BannerControllers', [])
 			}
 		});
 
+		$('#templates').bind('cancelTemplate', function(e){
+			$(this).fadeOut(400, function(){
+				$(this).hide();
+				$('.tab-content').hide();
+				$(this).next().removeClass('renew');
+				$(this).siblings('#cancelTpl').hide();
+				$(this).siblings('#settings').show();
+				$('#svg-editor').show();
+			});
+		});
+
 		var dimensions = {
 			'tpl-1' : {
 				width:810,
@@ -90,16 +101,27 @@ angular.module('BannerControllers', [])
 			'tpl-3' : {
 				width:810,
 				height:685
+			},
+			'tpl-4' : {
+				width:810,
+				height:339
+			},
+			'tpl-5' : {
+				width:810,
+				height:339
+			},
+			'tpl-6' : {
+				width:810,
+				height:339
 			}
 		};
 
-		$scope.yes = function(evt){
-			console.log('yes');
-			$('#question').trigger('renew');
+		$scope.overwiriteTplYes = function(evt){
+			$('#overwriteAlert').trigger('renew');
 		};
-		$scope.no = function(evt){
-			console.log('no');
+		$scope.overwiriteTplNo = function(evt){
 			$('.blockOverlay').click();
+			$('#templates').trigger('cancelTemplate');
 		};
 
 		$scope.doSetting = function($event){
@@ -131,15 +153,14 @@ angular.module('BannerControllers', [])
 
 			// clear the svg editor
 			if($btnTemplate.hasClass('renew')){
-				/*$('#question').bind('renew', function(){
+				$('#overwriteAlert').bind('renew', function(){
 					var self = this;
-					bannerSetting(settings, true, function(){
-						$('.blockOverlay').click();
-						$(self).unbind('renew');
-					});
+					$('.blockOverlay').click();
+					bannerSetting(settings, true);
+					$(self).unbind('renew');
 				});
 				$.blockUI({
-					message: $('#question'),
+					message: $('#overwriteAlert'),
 					css: {
 						background : 'transparent',
 						border     : 'none',
@@ -149,10 +170,10 @@ angular.module('BannerControllers', [])
 					}
 				});
 				$('.blockOverlay').attr('title','Click to cancel').click($.unblockUI);
-				return;*/
-				$btnTemplate.removeClass('renew');
-				$settingField.find('form')[0].reset();
-				$svgEditor.html('');
+				return;
+				// $btnTemplate.removeClass('renew');
+				// $settingField.find('form')[0].reset();
+				// $svgEditor.html('');
 			}
 			// return to the templates
 			if($templateField.is(':hidden')){
@@ -181,16 +202,16 @@ angular.module('BannerControllers', [])
 			var tplShowPrice  = options.tplShowPrice;
 
 			if( renew ){
+				$editorSVG.html('');
 				$btnTemplate.removeClass('renew');
 				$settingField.find('form')[0].reset();
-				$editorSVG.html('');
 			}
 
 			// canvas dimensions
 			var canvasDimensions = dimensions['tpl-' + tplShowPrice];
 			// compile SVG (inject scope)
 			var $svg = getSVGCompiled($tplContent, 'like', tplShowPrice);
-			// var $svg2 = getSVGCompiled($tplContent, 'enter', tplShowPrice);
+			var $svg2 = getSVGCompiled($tplContent, 'enter', tplShowPrice);
 			$tpl.fadeOut(400, function(){
 				$(this).hide();
 				$tplContent.hide();
@@ -198,15 +219,19 @@ angular.module('BannerControllers', [])
 				$btnTemplate.text('Choose template');
 
 				$settingField.fadeIn(function(){
+					// append svg
 					$editorSVG.append($svg);
-					// $editorSVG.append($svg2);
+					$editorSVG.append($svg2);
 					// create input hidden to set canvas dimensions
 					// will be used to image conversion
 					var inputCanvas = document.createElement("input");
 					inputCanvas.setAttribute("type", "hidden");
 					inputCanvas.setAttribute("name", "canvasDimensions");
 					inputCanvas.setAttribute("value", JSON.stringify(canvasDimensions));
+					// append canvas
 					$editorSVG.append(inputCanvas);
+					// set height drop background same as canvas dimension
+					$('#drop-background').css('height', canvasDimensions.height + 'px');
 
 					// show editor
 					if($editorSVG.is(':hidden')) $editorSVG.show();
@@ -217,23 +242,25 @@ angular.module('BannerControllers', [])
 						inputFileText : 'Add Background',
 						section       : 'background',
 						compile       : function(buttonEl, changeEl, image){
+							console.log('changeEl', changeEl);
 							// change the button text to 'Edit'
 							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-							// svg like
-							var imageBgEl = $('image.bg', $svg)[0];
-							imageBgEl.setAttribute('xlink:href',image.src);
-							imageBgEl.setAttribute('width', image.width);
-							imageBgEl.setAttribute('height', image.height);
-							imageBgEl.setAttribute('x', 0);
-							imageBgEl.setAttribute('y', 0);
+							// re-compile to injecting scope
+							for(var i in changeEl){
+								changeEl[i].setAttribute('xlink:href',image.src);
+								changeEl[i].setAttribute('width', image.width);
+								changeEl[i].setAttribute('height', image.height);
+								changeEl[i].setAttribute('x', 0);
+								changeEl[i].setAttribute('y', 0);
+							}
 							// bgReposition
 							$editorAction.show();
-							$('#drop-background').css('height', canvasDimensions.height + 'px');
-							$('body').trigger('bgReposition', {svg:$svg, type:tplShowPrice, canvasDimensions:canvasDimensions});
-							// svg like
-							// $('image.bg', $svg2)[0].setAttribute('xlink:href',image.src);
-							// $('image.bg', $svg2)[0].setAttribute('width', image.width);
-							// $('image.bg', $svg2)[0].setAttribute('height', image.height);
+							$('body').trigger('bgReposition', {
+								svg        : $svg,
+								imageBG    : changeEl,
+								type       : tplShowPrice,
+								dimension  : canvasDimensions
+							});
 						}
 					});
 					imageReader.init({
@@ -242,23 +269,28 @@ angular.module('BannerControllers', [])
 						inputFileText : 'Add Logo',
 						section       : 'logo',
 						compile       : function(buttonEl, changeEl, image){
+							// change text button input file
 							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
 							// re-compile to injecting scope
-							var $logo = $('#svg-editor > svg > #logo');
-							var logoHolder = $('rect', $logo)[0];
-							// inject logo holder (padding 20)
-							logoHolder.setAttribute('xlink:href',image.src);
-							logoHolder.setAttribute('width','{{getWH()}}');
-							logoHolder.setAttribute('height','{{getHH()}}');
-							// inject logo image
-							changeEl.setAttribute('xlink:href',image.src);
-							changeEl.setAttribute('width','{{banner.logo.w}}');
-							changeEl.setAttribute('height','{{banner.logo.h}}');
-							// remove old logo holder n image
-							$logo.html('');
-							// append new logo holder n image with inject scope
-							$logo.append($compile(logoHolder)($scope));
-							$logo.append($compile(changeEl)($scope));
+							angular.forEach(changeEl, function(e,i){
+								var logo = {
+									parent : $(e).parent(),
+									holder : $(e).prev()[0],
+									image  : e
+								};
+								// inject logo holder (padding 20)
+								logo.holder.setAttribute('width','{{getWH()}}');
+								logo.holder.setAttribute('height','{{getHH()}}');
+								// inject logo image
+								logo.image.setAttribute('xlink:href',image.src);
+								logo.image.setAttribute('width','{{banner.logo.w}}');
+								logo.image.setAttribute('height','{{banner.logo.h}}');
+								// remove old logo image n holder
+								logo.parent.html('');
+								// append new logo image n holder with inject scope
+								logo.parent.append($compile(logo.holder)($scope));
+								logo.parent.append($compile(logo.image)($scope));
+							});
 							// applying scope
 							$scope.$apply(function(scope){
 								scope.banner.logo.w = parseInt(image.width);
@@ -285,8 +317,12 @@ angular.module('BannerControllers', [])
 						inputFileText : 'Add Price 1',
 						section       : 'price-1',
 						compile       : function(buttonEl, changeEl, image){
+							// change text button input file
 							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-							changeEl.setAttribute('xlink:href',image.src);
+							// set image src
+							angular.forEach(changeEl, function(e,i){
+								e.setAttribute('xlink:href',image.src);
+							});
 						}
 					});
 					imageReader.init({
@@ -295,8 +331,12 @@ angular.module('BannerControllers', [])
 						inputFileText : 'Add Price 2',
 						section       : 'price-2',
 						compile       : function(buttonEl, changeEl, image){
+							// change text button input file
 							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-							changeEl.setAttribute('xlink:href',image.src);
+							// set image src
+							angular.forEach(changeEl, function(e,i){
+								e.setAttribute('xlink:href',image.src);
+							});
 						}
 					});
 					imageReader.init({
@@ -305,8 +345,12 @@ angular.module('BannerControllers', [])
 						inputFileText : 'Add Price 3',
 						section       : 'price-3',
 						compile       : function(buttonEl, changeEl, image){
+							// change text button input file
 							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-							changeEl.setAttribute('xlink:href',image.src);
+							// set image src
+							angular.forEach(changeEl, function(e,i){
+								e.setAttribute('xlink:href',image.src);
+							});
 						}
 					});
 
@@ -317,12 +361,16 @@ angular.module('BannerControllers', [])
 
 		var getSVGCompiled = function ($tplContent, type, tplIndex){
 			var $svg = $('.active > svg', $tplContent).clone();
+			$svg.attr('id', 'svg-editor-'+type);
 			$('#pattern', $svg).children().map(function(i,e){
 				$(e).attr('id', function(index, id){
 					return id.replace(/(\d+)/, function(fullMatch, n) {
 						return 'editor-'+type;
 					});
-				}).find('image').attr('class','bg');
+				});
+				if( $(e).find('image').length ){
+					$(e).find('image').attr('id', 'background-image-editor-'+type);
+				}
 			});
 			$('#shadow', $svg).children().map(function(i,e){
 				$(e).attr('id', function(index, id){
@@ -344,7 +392,7 @@ angular.module('BannerControllers', [])
 				if($(e).attr('id') !== undefined) {
 					$(e).attr('id', function(index, id){
 						return id.replace(/(\d+)/, function(fullMatch, n) {
-							return 'editor';
+							return 'editor-'+type;
 						});
 					});
 				} else if($(e).attr('filter') !== undefined) {
@@ -368,7 +416,7 @@ angular.module('BannerControllers', [])
 				}
 				$(e).attr('id', function(index, id){
 					return id.replace(/(\d+)/, function(fullMatch, n) {
-						return 'editor-' + n;
+						return 'editor-'+ type + '-' + n;
 					});
 				});
 			});
@@ -376,21 +424,10 @@ angular.module('BannerControllers', [])
 		};
 
 		$scope.cancelTemplate = function($event){
-			var $btn           = $($event.currentTarget);
-			var $btnSettings   = $btn.prev();
-			var $tpl           = $btn.siblings('#templates');
-			var $settingField = $btn.siblings('#settings');
-			var $tplContent    = $('.tab-content');
-			var $svgEditor     = $('#svg-editor');
-
-			$tpl.fadeOut(400, function(){
-				$btn.hide();
-				$btnSettings.removeClass('renew');
-				$tplContent.hide();
-				$settingField.show();
-				$svgEditor.show();
-			});
+			$('#templates').trigger('cancelTemplate');
 		};
+
+
 		$scope.addWhitePlaceholder = function(event){
 			var $placeholder = $(event.currentTarget);
 			var $rect = $('#svg-editor > svg > #logo > rect');

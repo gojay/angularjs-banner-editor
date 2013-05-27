@@ -115,14 +115,15 @@ angular.module('BannerComponents', [])
 
 				$('body').bind('bgReposition', function(e, data){
 					// define svg & image background element
-					var $svg = data.svg;
-					var imageBgEl = $('image.bg', $svg)[0];
+					var $svg      = data.svg;
+					var imageBG   = data.imageBG;
+					var imageBgEl = imageBG.like;
 					// get image background dimension
 					var w = parseInt(imageBgEl.getAttribute('width')),
 						h = parseInt(imageBgEl.getAttribute('height'));
 					// get different size with canvas
-					var maxW = parseInt(w - data.canvasDimensions.width),
-						maxH = parseInt(h - data.canvasDimensions.height);
+					var maxW = parseInt(w - data.dimension.width),
+						maxH = parseInt(h - data.dimension.height);
 					// helper
 					var toggleEl = (data.type == 3) ? '#logo, #description' : '#logo, #description, #price' ;
 					var top, x, y = 0;
@@ -136,6 +137,7 @@ angular.module('BannerComponents', [])
 							// hidden elements while dragging
 							$(toggleEl, $svg).hide();
 							$('#background > rect', $svg).eq(1).hide();
+							// set x, y position
 							x = parseInt(imageBgEl.getAttribute('x'));
 							y = parseInt(imageBgEl.getAttribute('y'));
 							// set start top position
@@ -150,8 +152,10 @@ angular.module('BannerComponents', [])
 							var newX = (calcLeft > 0) ? 0 : (calcLeft < -maxW) ? -maxW : calcLeft;
 							var newY = (calcTop > 0) ? 0 : (calcTop < -maxH) ? -maxH : calcTop;
 							// set attribute position
-							imageBgEl.setAttribute('x', newX);
-							imageBgEl.setAttribute('y', newY);
+							angular.forEach(imageBG, function(e){
+								e.setAttribute('x', newX);
+								e.setAttribute('y', newY);
+							});							
 						},
 						stop: function(event, ui) {
 							// show elements after dragging
@@ -164,12 +168,15 @@ angular.module('BannerComponents', [])
 				$scope.doBGReposition = function(evt){
 					console.log('reposition', evt.currentTarget);
 					var $button = $(evt.currentTarget);
+					var $svgLast = $('#svg-editor > svg#svg-editor-enter');
 					var $dropEl = $('#drop-background');
 					if($dropEl.is(':hidden')){
-						$dropEl.show();
+						$dropEl.fadeIn('slow');
+						$svgLast.show();
 						$button.html('<i class="icon-move"></i> Background Reposition');
 					} else {
-						$dropEl.hide();
+						$dropEl.fadeOut('slow');
+						$svgLast.hide();
 						$button.html('<i class="icon-ok"></i> Done');
 					}
 				};
