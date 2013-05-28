@@ -339,6 +339,7 @@ angular.module('BannerControllers', [])
 							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
 							// set image src
 							angular.forEach(changeEl, function(e,i){
+								console.log(e);
 								e.setAttribute('xlink:href',image.src);
 							});
 						}
@@ -420,6 +421,7 @@ angular.module('BannerControllers', [])
 				}
 				else return;
 			});
+			var _index = 1;
 			$('#price', $svg).children().map(function(i,e){
 				if($(e).attr('id') === undefined) return;
 				if(type == 'enter') {
@@ -429,9 +431,10 @@ angular.module('BannerControllers', [])
 				}
 				$(e).attr('id', function(index, id){
 					return id.replace(/(\d+)/, function(fullMatch, n) {
-						return 'editor-'+ type + '-' + n;
+						return 'editor-'+ type + '-' + _index;
 					});
 				});
+				_index++;
 			});
 			return $compile($svg)($scope);
 		};
