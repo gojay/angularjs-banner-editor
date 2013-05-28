@@ -1,6 +1,17 @@
 <div id="banner-editor" >
-	<h3>Design Preview</h3>
-	<div class="tab-content">
+	<h3 class="span8">Design Preview</h3>
+	<div id="display-tpl" class="hide span4 pull-right margin-top-bottom">
+		<label class="radio inline">
+		  	<input type="radio" id="inlineCheckbox1" name="displayTpl" ng-click="displayTpl($event)" value="like"> Like
+		</label>
+		<label class="radio inline">
+		  	<input type="radio" id="inlineCheckbox2" name="displayTpl" ng-click="displayTpl($event)" value="enter"> Enter
+		</label>
+		<label class="radio inline">
+		  	<input type="radio" id="inlineCheckbox3" name="displayTpl" ng-click="displayTpl($event)" checked="checked" value="both"> Both
+		</label>
+	</div>
+	<div class="span12 tab-content">
 		<div class="tab-pane active" id="svg-tpl-1">
 			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="810" height="381">
 				<defs>
@@ -439,9 +450,9 @@
 				</g>
 				<g id="price">
 					<rect x="30" y="209" width="350" height="50" fill="black" fill-opacity="0.75"></rect>
-					<text x="120" y="234" font-family="Super Sans" font-size="21" font-weight="bold" fill="white">
+					<text x="120" y="232" font-family="Super Sans" font-size="21" font-weight="bold" fill="white">
 						This Month's Prizes
-						<tspan font-size="14" font-weight="normal" x="143" y="250" font-family="Helvetica">Like our page to win!</tspan>
+						<tspan font-size="14" font-weight="normal" x="143" y="248" font-family="Helvetica">Like our page to win!</tspan>
 					</text>
 
 					<image id="price-image-7" xlink:href="images/new/dummy-170x68.png" x="33" y="264" width="170" height="68"></image>
@@ -535,9 +546,9 @@
 				</g>
 				<g id="price">
 					<rect x="30" y="210" width="430" height="50" fill="black" fill-opacity="0.75"></rect>
-					<text x="150" y="235" font-family="Super Sans" font-size="21" font-weight="bold" fill="white">
+					<text x="150" y="233" font-family="Super Sans" font-size="21" font-weight="bold" fill="white">
 						This Month's Prizes
-						<tspan font-size="14" font-weight="normal" x="173" y="254" font-family="Helvetica">Like our page to win!</tspan>
+						<tspan font-size="14" font-weight="normal" x="173" y="252" font-family="Helvetica">Like our page to win!</tspan>
 					</text>
 
 					<image id="price-image-9" xlink:href="images/new/dummy-137x68.png" x="30" y="265" width="137" height="68"></image>
@@ -582,8 +593,12 @@
 
 	<div id="action-editor" class="hide margin-top-bottom">
 		<button class="btn btn-block btn-primary" type="button" ng-click="doBGReposition($event)"><i class="icon-move"></i> Background Reposition</button>
-		<button class="btn btn-block" type="button" ng-click="convert($event)"><i class="icon-picture"></i> Create Image</button>
 	</div>
 	
+	<div id="result-generate-image" class="hide container">
+		<div class="row-fluid">
+			<ul class="thumbnails" style="margin: 15px 15px 0; text-align: left;"></ul>
+		</div>
+	</div>
 	<img id="loading-problem" class="hide" src="images/loading-problem.png" width="375" height="350" />
 </div>

@@ -116,28 +116,25 @@ angular.module('BannerControllers', [])
 			}
 		};
 
-		$scope.overwiriteTplYes = function(evt){
-			$('#alert-overwrite').trigger('overwrite');
-		};
-		$scope.overwiriteTplNo = function(evt){
-			$('.blockOverlay').click();
-			$('#templates').trigger('cancelTemplate');
-		};
-
 		$scope.doSetting = function($event){
-			var $btnTemplate   = $($event.currentTarget);
-			var $btnCancel     = $btnTemplate.next();
-			var $templateField = $btnTemplate.siblings('#templates');
-			var $settingField  = $btnTemplate.siblings('#settings');
-			var $contentField  = $('#banner-editor .tab-content');
-			var $svgEditor     = $('#svg-editor');
-			var $actEditor     = $('#action-editor');
-			var tplShowPrice   = $scope.tplShowPrice = $('ul > li.active > a', $templateField).data('tpl').match(/(\d)/)[0];
-
+			var $btnTemplate     = $($event.currentTarget);
+			var $btnCancel       = $btnTemplate.next();
+			var $templateField   = $btnTemplate.siblings('#templates');
+			var $settingField    = $btnTemplate.siblings('#settings');
+			var $contentField    = $('#banner-editor .tab-content');
+			var $displayTplField = $('#banner-editor #display-tpl');
+			var $svgEditor       = $('#svg-editor');
+			var $actEditor       = $('#action-editor');
+			var $liActive        = $('ul > li.active > a', $templateField);
+			var priceBottom      = $liActive.data('priceBottom');
+			var tplDimension     = $liActive.data('tpl');
+			var tplShowPrice     = $scope.tplShowPrice = $liActive.data('price').match(/(\d)/)[0];
+			
 			var settings = {
 				field : {
 					template : $templateField,
 					setting  : $settingField,
+					displayTpl : $displayTplField,
 					content  : $contentField
 				},
 				btn: {
@@ -148,7 +145,11 @@ angular.module('BannerControllers', [])
 					svg    : $svgEditor,
 					action : $actEditor
 				},
-				tplShowPrice : tplShowPrice
+				attributes : {
+					tplDimension : tplDimension,
+					priceBottom  : priceBottom,
+					tplShowPrice : tplShowPrice
+				}
 			};
 
 			// alert overwrite
@@ -174,29 +175,42 @@ angular.module('BannerControllers', [])
 			}
 			// return to the templates
 			if($templateField.is(':hidden')){
-				$btnCancel.show();
-				$actEditor.hide();
-				$templateField.fadeIn(400, function(){
+				$templateField.show(400, function(){
+					$btnCancel.show();
 					$btnTemplate.addClass('overwrite').text('Settings');
 					$contentField.show();
 					$settingField.hide();
+					$displayTplField.hide();
 					$svgEditor.hide();
+					$actEditor.hide();
 				});
 				return;
 			}
-
 			bannerSetting(settings, false);
+		};
+
+		$scope.overwiriteTplYes = function(evt){
+			$('#alert-overwrite').trigger('overwrite');
+		};
+		$scope.overwiriteTplNo = function(evt){
+			$('.blockOverlay').click();
+			$('#templates').trigger('cancelTemplate');
 		};
 
 		var bannerSetting = function( options, overwrite ){
 			var $tpl          = options.field.template;
 			var $settingField = options.field.setting;
 			var $tplContent   = options.field.content;
+			var $displayTpl   = options.field.displayTpl;
 			var $btnTemplate  = options.btn.template;
 			var $btnCancel    = options.btn.cancel;
 			var $editorSVG    = options.editor.svg;
 			var $editorAction = options.editor.action;
-			var tplShowPrice  = options.tplShowPrice;
+			var tplDimension  = options.attributes.tplDimension;
+			var priceBottom   = options.attributes.priceBottom;
+			var tplShowPrice  = options.attributes.tplShowPrice;
+
+			console.log('settings', options);
 
 			if( overwrite ){
 				// remove class overwrite
@@ -208,10 +222,11 @@ angular.module('BannerControllers', [])
 			}
 
 			// canvas dimensions
-			var canvasDimensions = dimensions['tpl-' + tplShowPrice];
+			var canvasDimensions = dimensions[tplDimension];
 			// compile SVG (inject scope)
-			var $svg = getSVGCompiled($tplContent, 'like', tplShowPrice);
-			var $svg2 = getSVGCompiled($tplContent, 'enter', tplShowPrice);
+			var tplIndex = tplDimension.match(/(\d)/)[0] - 1;
+			var $svg = getSVGCompiled($tplContent, 'like', tplIndex);
+			var $svg2 = getSVGCompiled($tplContent, 'enter', tplIndex);
 			$tpl.hide(400, function(){
 				$(this).hide();
 				$tplContent.hide();
@@ -219,6 +234,7 @@ angular.module('BannerControllers', [])
 				$btnTemplate.text('Choose template');
 
 				$settingField.show(400,function(){
+					$displayTpl.show();
 					// clear editor
 					$editorSVG.html('');
 					// append svg
@@ -258,10 +274,10 @@ angular.module('BannerControllers', [])
 							// bgReposition
 							$editorAction.show();
 							$('body').trigger('bgReposition', {
-								svg        : $svg,
-								imageBG    : changeEl,
-								type       : tplShowPrice,
-								dimension  : canvasDimensions
+								svg         : $svg,
+								imageBG     : changeEl,
+								priceBottom : priceBottom,
+								dimension   : canvasDimensions
 							});
 						}
 					});
@@ -355,14 +371,6 @@ angular.module('BannerControllers', [])
 							});
 						}
 					});
-
-					// centering header text price
-					var $text  = $('#price > text', $svg2);
-					var $tspan = $text.find('tspan');
-					// calculate new x position
-					var newX = parseInt(($text.width() - $tspan.width()) / 2) + parseInt($text[0].getAttribute('x'));
-					// set x position
-					$tspan[0].setAttribute('x',newX);
 				});
 			});
 		}
@@ -415,7 +423,9 @@ angular.module('BannerControllers', [])
 			$('#price', $svg).children().map(function(i,e){
 				if($(e).attr('id') === undefined) return;
 				if(type == 'enter') {
+					var x = [586,542,345,96,168,198];
 					$('#price > text > tspan', $svg).text('Enter to Win!');
+					$('#price > text > tspan', $svg).attr('x', x[tplIndex]);
 				}
 				$(e).attr('id', function(index, id){
 					return id.replace(/(\d+)/, function(fullMatch, n) {
@@ -438,5 +448,215 @@ angular.module('BannerControllers', [])
 			} else {
 				$rect.attr('fill', 'transparent');
 			}
+		};
+
+		function createCanvas(svg, canvasDimensions, callback){
+			var svg_xml = (new XMLSerializer()).serializeToString(svg);
+			var canvas    = document.createElement('canvas');
+			canvas.width  = canvasDimensions.width;
+			canvas.height = canvasDimensions.height;
+			// get canvas context
+			var ctx = canvas.getContext("2d");
+			var img = new Image();
+			img.onload = function(){
+				ctx.drawImage(img, 0, 0);
+				var imgDataURI = canvas.toDataURL('image/png');
+				callback(img, imgDataURI);
+			};
+			img.src = "data:image/svg+xml;base64," + btoa(svg_xml);
+		}
+
+		// SVG to dataURI
+		$scope.convert = function(evt){
+			$.blockUI({
+				message: $('#loading-problem'),
+				css: {
+					background : 'transparent',
+					border     : 'none',
+					top        : ($(window).height() - 350) / 2 + 'px',
+					left       : ($(window).width() - 375) / 2 + 'px',
+					width      : '350px'
+				}
+			});
+
+			$('#svg-editor > svg').each(function(){ $(this).show(); });
+			var svg_like  = $('#svg-editor > svg').eq(0)[0];
+			var svg_enter = $('#svg-editor > svg').eq(1)[0];
+			// get canvas dimensions
+			var canvasDimensions = JSON.parse($('input[name="canvasDimensions"]').val());
+			// create canvas banner like
+			createCanvas(svg_like, canvasDimensions, function(imgLike, imgDataURILike){
+				// create download anchor
+				var downloadLinkLike       = document.createElement('a');
+				downloadLinkLike.title     = 'Download Banner Like';
+				downloadLinkLike.href      = imgDataURILike;
+				downloadLinkLike.target    = '_blank';
+				downloadLinkLike.className = 'btn btn-success';
+				downloadLinkLike.innerHTML = 'Download Banner Like';
+				downloadLinkLike.download  = 'banner-like.png';
+				// create canvas banner enter
+				createCanvas(svg_enter, canvasDimensions, function(imgEnter, imgDataURIEnter){
+					// create download anchor
+					var downloadLinkEnter       = document.createElement('a');
+					downloadLinkEnter.title     = 'Download Banner Enter';
+					downloadLinkEnter.href      = imgDataURIEnter;
+					downloadLinkEnter.target    = '_blank';
+					downloadLinkEnter.className = 'btn btn-success';
+					downloadLinkEnter.innerHTML = 'Download Banner Enter';
+					downloadLinkEnter.download  = 'banner-enter.png';
+					// set image class
+					imgLike.className  = 'span12';
+					imgEnter.className = 'span12';
+					// define generate element
+					var $generate = $('#result-generate-image');
+					// create template banner list
+					var tplImages = '<li class="span6 banner-like">' +
+										'<div class="thumbnail">' + imgLike.outerHTML +
+											'<div class="caption">' +
+												'<h3>Banner Like</h3>' +
+												'<p>This is banner like description</p>'+
+												'<p>'+ downloadLinkLike.outerHTML +'</p>' +
+											'</div>' +
+										'</div>' +
+									'</li>'+
+									'<li class="span6 banner-like">' +
+										'<div class="thumbnail">' + imgEnter.outerHTML +
+											'<div class="caption">' +
+												'<h3>Banner Enter</h3>' +
+												'<p>This is banner enter description</p>'+
+												'<p>'+ downloadLinkEnter.outerHTML +'</p>' +
+											'</div>' +
+										'</div>' +
+									'</li>';
+					// append banner images
+					$generate.find('ul').append(tplImages);
+					// open popup
+					setTimeout(function() {
+						$.unblockUI({
+							onUnblock: function() {
+								$.blockUI({
+									overlayCSS:{
+										border : '3px solid #006DCC'
+									},
+									message: $generate,
+									css: {
+										cursor: 'default',
+										top    : ($(window).height() - $generate.height()) / 2 + 'px',
+										left   : ($(window).width() - $generate.width()) / 2 + 'px',
+										width  : $generate.width() + 'px',
+										height : $generate.height() + 'px'
+									}
+								});
+								$('.blockOverlay').attr('title', 'Click to cancel').click($.unblockUI);
+							}
+						});
+					}, 3000);
+				});
+			})
+			// get svg n convert foreignobject to xml
+			// var svg_like = $('#svg-editor > svg').eq(0)[0];
+			// var svg_xml_like = (new XMLSerializer()).serializeToString(svg_like);
+			// var svg_enter = $('#svg-editor > svg').eq(1)[0];
+			// var svg_xml_enter = (new XMLSerializer()).serializeToString(svg_enter);
+			// // get canvas dimensions
+			// var canvasDimensions = JSON.parse($('input[name="canvasDimensions"]').val());
+			// // create canvas
+			// var canvas    = document.createElement('canvas');
+			// canvas.width  = canvasDimensions.width;
+			// canvas.height = canvasDimensions.height;
+			// // get canvas context
+			// var ctx = canvas.getContext("2d");
+			// // Base64-encode the XML as data URL
+			// var imgLike = new Image();
+			// imgLike.onload = function(){
+			// 	// drawing canvas image
+			// 	// ctx.drawImage(imgLike, 0, 0);
+			// 	// convert canvas to datauri
+			// 	var imgDataURI = canvas.toDataURL('image/png');
+			// 	// create anchor element
+			// 	var downloadLink       = document.createElement('a');
+			// 	downloadLink.title     = 'Download banner';
+			// 	downloadLink.href      = imgDataURI;
+			// 	downloadLink.target    = '_blank';
+			// 	downloadLink.className = 'btn btn-success';
+			// 	downloadLink.innerHTML = 'Download banner';
+			// 	downloadLink.download  = 'banner.png';
+			// 	// append canvas n anchor
+			// 	// $('#svg-editor')
+			// 	// 	.append(canvas)
+			// 	// 	.append(downloadLink);
+			// 	// window.open(canvas.toDataURL('image/png'));
+			// 	imgLike.className = 'span12';
+
+			// 	var imgEnter = new Image();
+			// 	imgEnter.onload = function(){
+
+			// 	};
+			// 	imgEnter.src = "data:image/svg+xml;base64," + btoa(svg_xml);
+
+			// 	var $generate     = $('#result-generate-image');
+			// 	var $generateList = $generate.find('ul');
+			// 	var tpl = '<li class="span6 banner-like">' +
+			// 				'<div class="thumbnail">' +
+			// 					imgLike.outerHTML +
+			// 					'<div class="caption">' +
+			// 						'<h3>Banner Like</h3>' +
+			// 						'<p>This is banner description</p>'+
+			// 						'<p>'+ downloadLink.outerHTML +'</p>' +
+			// 					'</div>' +
+			// 				'</div>' +
+			// 			'</li>';
+			// 	$generateList
+			// 		.append(tpl)
+			// 		.append(tpl);
+
+			// 	setTimeout(function() {
+			// 		$.unblockUI({
+			// 			onUnblock: function() {
+			// 				$.blockUI({
+			// 					border: '1px solid #006DCC',
+			// 					message: $generate,
+			// 					css: {
+			// 						cursor: 'default',
+			// 						top    : ($(window).height() - $generate.height()) / 2 + 'px',
+			// 						left   : ($(window).width() - $generate.width()) / 2 + 'px',
+			// 						width  : $generate.width() + 'px',
+			// 						height : $generate.height() + 'px'
+			// 					}
+			// 				});
+			// 				$('.blockOverlay').attr('title', 'Click to cancel').click($.unblockUI);
+			// 			}
+			// 		});
+			// 	}, 300);
+			// };
+			// imgLike.src = "data:image/svg+xml;base64," + btoa(svg_xml);
+		};
+
+		$scope.test = function(evt){
+			var self = evt.currentTarget;
+			$.blockUI({
+				timeout: 3000,
+				message: $('#loading-problem'),
+				css: {
+					background : 'transparent',
+					border     : 'none',
+					top        : ($(window).height() - 350) / 2 + 'px',
+					left       : ($(window).width() - 375) / 2 + 'px',
+					width      : '350px'
+				},
+				onUnblock: function() {
+					$.blockUI({
+						border    : '1px solid #0044cc',
+						message   : $('#result'),
+						css : {
+							cursor: 'default',
+							top   : ($(window).height() - $('#result').height()) / 2 + 'px',
+							left  : ($(window).width() - $('#result').width()) / 2 + 'px',
+							width : $('#result').width() + 'px'
+						}
+					});
+					$('.blockOverlay').attr('title','Click to cancel').click($.unblockUI);
+				}
+			});
 		};
 	});

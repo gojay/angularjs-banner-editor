@@ -33,6 +33,11 @@ html {
 	margin: 40px 0;
 }
 
+.modal-large {
+   width:940px;
+   margin-left:-470px;
+}
+
 .sidebar .left-side {
 	margin-top: 80px;
 }

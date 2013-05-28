@@ -72,7 +72,7 @@ angular.module('BannerProvider', [])
 						compile       : null
 					};
 
-					console.log('options', options);
+					// console.log('options', options);
 
 					/* auto merging default options */
 
