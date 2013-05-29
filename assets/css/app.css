@@ -133,3 +133,16 @@ input[type="checkbox"] ~ label {
 	position: relative;
 	top: 3px;
 }
+
+#crop-handle {
+	width:100%; 
+	position: fixed; 
+	bottom:0;
+	z-index: 1020;
+	padding: 10px 0;
+	background-color: rgba(0,0,0,0.2); 
+	text-align: center;
+}
+#crop-handle button {
+	margin: 0 5px;
+}

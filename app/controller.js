@@ -91,28 +91,64 @@ angular.module('BannerControllers', [])
 
 		var dimensions = {
 			'tpl-1' : {
-				width:810,
-				height:381
+				background : {
+					width:810,
+					height:381
+				},
+				logo : {
+					width:340,
+					height:183
+				}				
 			},
 			'tpl-2' : {
-				width:810,
-				height:339
+				background : {
+					width:810,
+					height:339
+				},
+				logo : {
+					width:203,
+					height:130
+				}
 			},
 			'tpl-3' : {
-				width:810,
-				height:685
+				background : {
+					width:770,
+					height:315
+				},
+				logo : {
+					width:250,
+					height:250
+				}
 			},
 			'tpl-4' : {
-				width:810,
-				height:339
+				background : {
+					width:810,
+					height:339
+				},
+				logo : {
+					width:208,
+					height:109
+				}
 			},
 			'tpl-5' : {
-				width:810,
-				height:339
+				background : {
+					width:810,
+					height:339
+				},
+				logo : {
+					width:170,
+					height:68
+				}
 			},
 			'tpl-6' : {
-				width:810,
-				height:339
+				background : {
+					width:810,
+					height:339
+				},
+				logo : {
+					width:137,
+					height:68
+				}
 			}
 		};
 
@@ -222,7 +258,9 @@ angular.module('BannerControllers', [])
 			}
 
 			// canvas dimensions
-			var canvasDimensions = dimensions[tplDimension];
+			var canvasDimensions    = dimensions[tplDimension];
+			var backgroundDimension = canvasDimensions['background'];
+			var logoDimension       = canvasDimensions['logo'];
 			// compile SVG (inject scope)
 			var tplIndex = tplDimension.match(/(\d)/)[0] - 1;
 			var $svg = getSVGCompiled($tplContent, 'like', tplIndex);
@@ -245,11 +283,11 @@ angular.module('BannerControllers', [])
 					var inputCanvas = document.createElement("input");
 					inputCanvas.setAttribute("type", "hidden");
 					inputCanvas.setAttribute("name", "canvasDimensions");
-					inputCanvas.setAttribute("value", JSON.stringify(canvasDimensions));
+					inputCanvas.setAttribute("value", JSON.stringify(backgroundDimension));
 					// append canvas
 					$editorSVG.append(inputCanvas);
 					// set height drop background same as canvas dimension
-					$('#drop-background').css('height', canvasDimensions.height + 'px');
+					$('#drop-background').css('height', backgroundDimension.height + 'px');
 
 					// show editor
 					if($editorSVG.is(':hidden')) $editorSVG.show();
@@ -261,24 +299,130 @@ angular.module('BannerControllers', [])
 						section       : 'background',
 						compile       : function(buttonEl, changeEl, image){
 							console.log('changeEl', changeEl);
-							// change the button text to 'Edit'
-							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-							// re-compile to injecting scope
-							for(var i in changeEl){
-								changeEl[i].setAttribute('xlink:href',image.src);
-								changeEl[i].setAttribute('width', image.width);
-								changeEl[i].setAttribute('height', image.height);
-								changeEl[i].setAttribute('x', 0);
-								changeEl[i].setAttribute('y', 0);
+
+							if(image.width == backgroundDimension.width && image.height == backgroundDimension.height){
+								// change the button text to 'Edit'
+								buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
+								// re-compile to injecting scope
+								for(var i in changeEl){
+									changeEl[i].setAttribute('xlink:href',image.src);
+									changeEl[i].setAttribute('width', image.width);
+									changeEl[i].setAttribute('height', image.height);
+									changeEl[i].setAttribute('x', -Math.abs(cropSelection.x1));
+									changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
+								}
+								// bgReposition
+								$editorAction.show();
+								$('body').trigger('bgReposition', {
+									svg         : $svg,
+									imageBG     : changeEl,
+									priceBottom : priceBottom,
+									dimension   : backgroundDimension
+								});
+								return;
 							}
-							// bgReposition
-							$editorAction.show();
-							$('body').trigger('bgReposition', {
-								svg         : $svg,
-								imageBG     : changeEl,
-								priceBottom : priceBottom,
-								dimension   : canvasDimensions
+
+							// define crop selection
+							var cropSelection = {};
+							// create temporary image fro cropping
+							$(image).attr('id', 'tempImage');
+							// append to body
+							$('body').append($(image));
+							// calculating crop center
+							var x1 = parseInt((image.width - backgroundDimension.width) / 2);
+							var y1 = parseInt((image.height - backgroundDimension.height) / 2);
+							var pos = {
+								x1 : x1,
+								y1 : y1,
+								x2 : parseInt(x1 + backgroundDimension.width),
+								y2 : parseInt(y1 + backgroundDimension.height)
+							};
+							// show crop popup
+							$.blockUI({
+								message: $('#tempImage'),
+								overlayCSS:{
+									cursor : 'default'
+								},
+								css: {
+									cursor : 'default',
+									border : 'none',
+									top    : ($(window).height() - image.height) / 2 + 'px',
+									left   : ($(window).width() - image.width) / 2 + 'px',
+									width  : image.width + 'px'
+								},
+								onBlock: function(){
+									$('#tempImage').imgAreaSelect({
+										x1 : pos.x1,
+										y1 : pos.y1,
+										x2 : pos.x2,
+										y2 : pos.y2,
+										resizable : false,
+										handles   : true,
+										fadeSpeed : 200,
+										onInit    : function(img, selection){
+											console.log('imgAreaSelect init', 'x', -selection.x1, 'y', -selection.y1);
+											// set cropSelection
+											cropSelection = selection;
+											var $handle = $('.imgareaselect-handle').last().parent();
+											$handle.parent().append($compile('<div id="crop-handle"><button class="btn btn-primary" ng-click="doCrop()"><i class="icon-crop"></i> Crop</button><button class="btn" ng-click="cancelCrop()">Cancel</button></div>')($scope));
+										},
+										onSelectStart : function(){
+											console.log('imgAreaSelect start');
+										},
+										onSelectChange : function(img, selection){
+											if(!selection.width || !selection.height) return;
+											console.log('imgAreaSelect change', 'x', -selection.x1, 'y', -selection.y1);
+										},
+										onSelectEnd : function(img, selection){
+											console.log('imgAreaSelect end');
+											// set cropSelection
+											cropSelection = selection;
+										}
+									});
+								}
 							});
+							// do crop
+							$scope.doCrop = function(){
+								$.unblockUI({
+									onUnblock: function() {
+										// remove imgAreaSelect
+										$(".imgareaselect-selection").parent().remove();
+										$(".imgareaselect-outer").remove();
+										$('#tempImage').remove();
+										$('#crop-handle').remove();
+										// change the button text to 'Edit'
+										buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
+										// re-compile to injecting scope
+										for(var i in changeEl){
+											changeEl[i].setAttribute('xlink:href',image.src);
+											changeEl[i].setAttribute('width', image.width);
+											changeEl[i].setAttribute('height', image.height);
+											changeEl[i].setAttribute('x', -Math.abs(cropSelection.x1));
+											changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
+										}
+										// bgReposition
+										$editorAction.show();
+										$('body').trigger('bgReposition', {
+											svg         : $svg,
+											imageBG     : changeEl,
+											priceBottom : priceBottom,
+											dimension   : backgroundDimension
+										});
+									}
+								});
+							};
+							// cancel crop
+							$scope.cancelCrop = function(){
+								$.unblockUI({
+									onUnblock: function() {
+										// remove imgAreaSelect
+										$(".imgareaselect-selection").parent().remove();
+										$(".imgareaselect-outer").remove();
+										$('#tempImage').remove();
+										$('#crop-handle').remove();
+									}
+								});
+							};
 						}
 					});
 					imageReader.init({
@@ -329,48 +473,135 @@ angular.module('BannerControllers', [])
 							});
 						}
 					});
+
+					// callback price compile
+					var priceCompile = function(buttonEl, changeEl, image){
+						/*// change text button input file
+						buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
+						// set image src
+						angular.forEach(changeEl, function(e,i){
+							console.log(e);
+							e.setAttribute('xlink:href',image.src);
+							e.setAttribute('width',image.width);
+							e.setAttribute('height',image.height);
+						});*/
+						
+						// change text button input file
+						buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
+						// define crop selection
+						var cropSelection = {};
+						// create temporary image fro cropping
+						$(image).attr('id', 'tempImage');
+						// append to body
+						$('body').append($(image));
+						// calculating crop center
+						var x1 = parseInt((image.width - logoDimension.width) / 2);
+						var y1 = parseInt((image.height - logoDimension.height) / 2);
+						var pos = {
+							x1 : x1,
+							y1 : y1,
+							x2 : parseInt(x1 + logoDimension.width),
+							y2 : parseInt(y1 + logoDimension.height)
+						};
+						// show crop popup
+						$.blockUI({
+							message: $('#tempImage'),
+							overlayCSS:{
+								cursor : 'default'
+							},
+							css: {
+								cursor : 'default',
+								border : 'none',
+								top    : ($(window).height() - image.height) / 2 + 'px',
+								left   : ($(window).width() - image.width) / 2 + 'px',
+								width  : image.width + 'px'
+							},
+							onBlock: function(){
+								$('#tempImage').imgAreaSelect({
+									x1 : pos.x1,
+									y1 : pos.y1,
+									x2 : pos.x2,
+									y2 : pos.y2,
+									resizable : false,
+									handles   : true,
+									fadeSpeed : 200,
+									onInit    : function(img, selection){
+										console.log('imgAreaSelect init', 'x', -selection.x1, 'y', -selection.y1);
+										// set cropSelection
+										cropSelection = selection;
+										var $handle = $('.imgareaselect-handle').last().parent();
+										$handle.parent().append($compile('<div id="crop-handle"><button class="btn btn-primary" ng-click="doCrop()"><i class="icon-crop"></i> Crop</button><button class="btn" ng-click="cancelCrop()">Cancel</button></div>')($scope));
+									},
+									onSelectStart : function(){
+										console.log('imgAreaSelect start');
+									},
+									onSelectChange : function(img, selection){
+										if(!selection.width || !selection.height) return;
+										console.log('imgAreaSelect change', 'x', -selection.x1, 'y', -selection.y1);
+									},
+									onSelectEnd : function(img, selection){
+										console.log('imgAreaSelect end');
+										// set cropSelection
+										cropSelection = selection;
+									}
+								});
+							}
+						});
+						// do crop
+						$scope.doCrop = function(){
+							$.unblockUI({
+								onUnblock: function() {
+									// remove imgAreaSelect
+									$(".imgareaselect-selection").parent().remove();
+									$(".imgareaselect-outer").remove();
+									$('#tempImage').remove();
+									$('#crop-handle').remove();
+									// set image src
+									angular.forEach(changeEl, function(e,i){
+										console.log(e);
+										e.setAttribute('xlink:href',image.src);
+										e.setAttribute('width',image.width);
+										e.setAttribute('height',image.height);
+										e.setAttribute('x', -Math.abs(cropSelection.x1));
+										e.setAttribute('y', -Math.abs(cropSelection.y1));
+									});
+								}
+							});
+						};
+						// cancel crop
+						$scope.cancelCrop = function(){
+							$.unblockUI({
+								onUnblock: function() {
+									// remove imgAreaSelect
+									$(".imgareaselect-selection").parent().remove();
+									$(".imgareaselect-outer").remove();
+									$('#tempImage').remove();
+									$('#crop-handle').remove();
+								}
+							});
+						};
+					};
+
 					imageReader.init({
 						dropArea      : '#drop-price-1',
 						inputFileEl   : '#input-price-1',
 						inputFileText : 'Add Price 1',
 						section       : 'price-1',
-						compile       : function(buttonEl, changeEl, image){
-							// change text button input file
-							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-							// set image src
-							angular.forEach(changeEl, function(e,i){
-								console.log(e);
-								e.setAttribute('xlink:href',image.src);
-							});
-						}
+						compile       : priceCompile
 					});
 					imageReader.init({
 						dropArea      : '#drop-area',
 						inputFileEl   : '#input-price-2',
 						inputFileText : 'Add Price 2',
 						section       : 'price-2',
-						compile       : function(buttonEl, changeEl, image){
-							// change text button input file
-							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-							// set image src
-							angular.forEach(changeEl, function(e,i){
-								e.setAttribute('xlink:href',image.src);
-							});
-						}
+						compile       : priceCompile
 					});
 					imageReader.init({
 						dropArea      : '#drop-area',
 						inputFileEl   : '#input-price-3',
 						inputFileText : 'Add Price 3',
 						section       : 'price-3',
-						compile       : function(buttonEl, changeEl, image){
-							// change text button input file
-							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-							// set image src
-							angular.forEach(changeEl, function(e,i){
-								e.setAttribute('xlink:href',image.src);
-							});
-						}
+						compile       : priceCompile
 					});
 				});
 			});
@@ -385,9 +616,9 @@ angular.module('BannerControllers', [])
 						return 'editor-'+type;
 					});
 				});
-				if( $(e).find('image').length ){
-					$(e).find('image').attr('id', 'background-image-editor-'+type);
-				}
+				// if( $(e).find('image').length ){
+				// 	$(e).find('image').attr('id', 'background-image-editor-'+type);
+				// }
 			});
 			$('#shadow', $svg).children().map(function(i,e){
 				$(e).attr('id', function(index, id){

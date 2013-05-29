@@ -39,26 +39,26 @@ angular.module('BannerProvider', [])
 							break;
 						case 'background':
 							options.changeEl = {
-								like  : $svg_like.find('image#background-image-editor-like')[0],
-								enter : $svg_enter.find('image#background-image-editor-enter')[0]
+								like  : $svg_like.find('#banner-background-editor-like > image')[0],
+								enter : $svg_enter.find('#banner-background-editor-enter > image')[0]
 							};
 							break;
 						case 'price-1':
 							options.changeEl = {
-								like  : $svg_like.find('image#price-image-editor-like-1')[0],
-								enter : $svg_enter.find('image#price-image-editor-enter-1')[0]
+								like  : $svg_like.find('#price-image-editor-like-1 > image')[0],
+								enter : $svg_enter.find('#price-image-editor-enter-1 > image')[0]
 							};
 							break;
 						case 'price-2':
 							options.changeEl = {
-								like  : $svg_like.find('image#price-image-editor-like-2')[0],
-								enter : $svg_enter.find('image#price-image-editor-enter-2')[0]
+								like  : $svg_like.find('#price-image-editor-like-2 > image')[0],
+								enter : $svg_enter.find('#price-image-editor-enter-2 > image')[0]
 							};
 							break;
 						case 'price-3':
 							options.changeEl = {
-								like  : $svg_like.find('image#price-image-editor-like-3')[0],
-								enter : $svg_enter.find('image#price-image-editor-enter-3')[0]
+								like  : $svg_like.find('#price-image-editor-like-3 > image')[0],
+								enter : $svg_enter.find('#price-image-editor-enter-3 > image')[0]
 							};
 							break;
 					}
@@ -160,11 +160,6 @@ angular.module('BannerProvider', [])
 						var image = new Image();
 						image.onload = function(){
 							console.log(image.width, image.height);
-							/*if(! /price/.test(config.section) ){
-								changeEl.setAttribute('xlink:href', e.target.result);
-								changeEl.setAttribute('width', image.width);
-								changeEl.setAttribute('height', image.height);
-							}*/
 							if( config.compile ) config.compile(buttonEl, changeEl, image);
 						};
 						image.src = e.target.result;
