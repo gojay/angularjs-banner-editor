@@ -103,8 +103,6 @@ angular.module('BannerProvider', [])
 					$(config.inputFileEl).bind('change', {config : config}, function(evt){
 						var file   = evt.target.files[0];
 						var config = evt.data.config;
-						console.log('config',config);
-						console.log('change',file);
 						self.handleReadImage(file, config);
 					});
 

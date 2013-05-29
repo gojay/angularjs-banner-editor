@@ -1,15 +1,9 @@
 <div id="banner-editor" >
-	<h3 class="span8">Design Preview</h3>
-	<div id="display-tpl" class="hide span4 pull-right margin-top-bottom">
-		<label class="radio inline">
-		  	<input type="radio" id="inlineCheckbox1" name="displayTpl" ng-click="displayTpl($event)" value="like"> Like
-		</label>
-		<label class="radio inline">
-		  	<input type="radio" id="inlineCheckbox2" name="displayTpl" ng-click="displayTpl($event)" value="enter"> Enter
-		</label>
-		<label class="radio inline">
-		  	<input type="radio" id="inlineCheckbox3" name="displayTpl" ng-click="displayTpl($event)" checked="checked" value="both"> Both
-		</label>
+	<h3 class="span9">Design Preview</h3>
+	<div id="display-tpl" class="hide span3 btn-group margin-top-bottom">
+	    <button class="btn" ng-click="displayTpl($event, 'like')">Like</button>
+	    <button class="btn" ng-click="displayTpl($event, 'both')" disabled="true">Both</button>
+	    <button class="btn" ng-click="displayTpl($event, 'enter')">Enter</button>
 	</div>
 	<div class="span12 tab-content">
 		<div class="tab-pane active" id="svg-tpl-1">
@@ -83,6 +77,7 @@
 					</text>
 
 					<svg id="price-image-1"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="450" y="175" width="340" height="183">
+						<rect x="0" y="0" width="340" height="183" fill="white"></rect>
 						<image xlink:href="data:image/png;base64,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" x="0" y="0" width="340" height="183" />
 					</svg>
 					<rect x="450" y="175" width="340" height="183" stroke="white" stroke-width="5" fill="transparent" />
@@ -169,6 +164,7 @@
 					</text>
 
 					<svg id="price-image-2"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="374" y="189" width="203" height="130">
+						<rect x="0" y="0" width="203" height="130" fill="white"></rect>
 						<image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMsAAACCBAMAAAAagiGkAAAAG1BMVEVRo1H19fV6t3qjzKPM4Mzg6uC31reOwY5lrWXuaRLhAAACuUlEQVRoge2WzW/TQBDFTeymPjK0bjm2QFWOjagERyxB6RETInGMDyCOCULAMVEx6p/N7Mx+zW5j4Mz8DvXWfnlvZ7/solAURVEURVEURVEURVEURVH+kcevF1c/uDm5tM39Z8zF+E9vWCDU3kNQ92AgRd26ZgXM/dGUSceCWB08pJQVR6Y9+ObfxcwgjwkeSczh8+8fAVbY7mD+6Bt1pfxkAHg7ljJ1/YjVwUPGzDdUKUpKaLC9hof2UUX/76TuRLmsTj28mP5uzf179LD0FbfwYayYM2iGKIbVqYekggdFcQpLkwsN3/spirkVF0MH13shxqoTj4QpHBdFDyfcLbrgmETF1ItNdOGYgyLEOLX0uLOaFshjRssBl0xczMAuQ7QoulUU49TSI2XPDGnHla5pmchi7ATjzaW/dV2EGK8WHhlb00s7oDy8Q7LMaIaHZGp9jFcLj4we02s4tJFL6g80b5JyRDEixqmlR0oNOKRB8pJ/CPBOlpMWI2JILT1SKjhIJV9f4e6Lxw3LSYsJMU49HjMzU5NJbkDYtvlRFe0bVo/GlEDLMBvXU3F0VpANeBzD6rG5WZtdc8cqqfi+Bc/e9PARMaQeWWkln894etjQlX9wHFR1MldZDKkzj8DMutmDovcHhYjBZZadpXlM5uHB18aJjbvgojb+SRg0s2eyN4OIIXXm4X/fuu1BR4F5z7lH28iF9kxajoghdebhOPNdpN2DP8XaJ3SrD8uSD4C0HBsTqSMPwT7u3ltkQ58FL8xnBKqnR/hx8gTCCNsDoJWvbRsTqSMPgftcMPH4CfG+oz2E89UsgHrmZMvoksZE6uCxM6YEd5BNIXxWMVfiksV4dfDYGVP8wsbcNOpLbDWfU3GKjRFq7zHC5PypbdXnXzZ/SgnE6uChKIqiKIqiKIqiKIqiKMp/zW+l6pcI45BO8QAAAABJRU5ErkJggg==" x="0" y="0" width="203" height="130" />
 					</svg>
 					<rect x="374" y="189" width="203" height="130" stroke="white" stroke-width="5" fill="transparent" />
@@ -181,6 +177,7 @@
 					</foreignObject>
 
 					<svg id="price-image-3"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="588" y="189" width="203" height="130">
+						<rect x="0" y="0" width="203" height="130" fill="white"></rect>
 						<image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMsAAACCBAMAAAAagiGkAAAAG1BMVEVRo1H19fV6t3qjzKPM4Mzg6uC31reOwY5lrWXuaRLhAAACuUlEQVRoge2WzW/TQBDFTeymPjK0bjm2QFWOjagERyxB6RETInGMDyCOCULAMVEx6p/N7Mx+zW5j4Mz8DvXWfnlvZ7/solAURVEURVEURVEURVEURVH+kcevF1c/uDm5tM39Z8zF+E9vWCDU3kNQ92AgRd26ZgXM/dGUSceCWB08pJQVR6Y9+ObfxcwgjwkeSczh8+8fAVbY7mD+6Bt1pfxkAHg7ljJ1/YjVwUPGzDdUKUpKaLC9hof2UUX/76TuRLmsTj28mP5uzf179LD0FbfwYayYM2iGKIbVqYekggdFcQpLkwsN3/spirkVF0MH13shxqoTj4QpHBdFDyfcLbrgmETF1ItNdOGYgyLEOLX0uLOaFshjRssBl0xczMAuQ7QoulUU49TSI2XPDGnHla5pmchi7ATjzaW/dV2EGK8WHhlb00s7oDy8Q7LMaIaHZGp9jFcLj4we02s4tJFL6g80b5JyRDEixqmlR0oNOKRB8pJ/CPBOlpMWI2JILT1SKjhIJV9f4e6Lxw3LSYsJMU49HjMzU5NJbkDYtvlRFe0bVo/GlEDLMBvXU3F0VpANeBzD6rG5WZtdc8cqqfi+Bc/e9PARMaQeWWkln894etjQlX9wHFR1MldZDKkzj8DMutmDovcHhYjBZZadpXlM5uHB18aJjbvgojb+SRg0s2eyN4OIIXXm4X/fuu1BR4F5z7lH28iF9kxajoghdebhOPNdpN2DP8XaJ3SrD8uSD4C0HBsTqSMPwT7u3ltkQ58FL8xnBKqnR/hx8gTCCNsDoJWvbRsTqSMPgftcMPH4CfG+oz2E89UsgHrmZMvoksZE6uCxM6YEd5BNIXxWMVfiksV4dfDYGVP8wsbcNOpLbDWfU3GKjRFq7zHC5PypbdXnXzZ/SgnE6uChKIqiKIqiKIqiKIqiKMp/zW+l6pcI45BO8QAAAABJRU5ErkJggg==" x="0" y="0" width="203" height="130" />
 					</svg>
 					<rect x="588" y="189" width="203" height="130" stroke="white" stroke-width="5" fill="transparent" />
@@ -267,6 +264,7 @@
 					</text>
 
 					<svg id="price-image-3"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="20" y="405" width="250" height="250">
+						<rect x="0" y="0" width="250" height="250" fill="white"></rect>
 						<image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6BAMAAAB6wkcOAAAAG1BMVEUvlrT19fVgrcR5ucyq0dzD3eSSxdTc6exHobyF7/hOAAAC90lEQVR4nO3WvU/bQBzGccdOTMYeENLRaTswBqWVOiZBhZVUonMsVXRtJNR2TKAq/bN7b07ujA0+RwyVvp8B45ff47vz+ZwoAgAAAAAAAAAAAAAAAAAAAAAAAAD8/+L319dfMvv/xBqb/ftP1xfZS6a8WwlpuNQ7qbC+693f+v9lg5u3TEnshcO12ut6dYl76kltU4o68etx3Zl7qtHdQ1MSMTw/vfsmxLHa64nhjbaUO33Z4I/RH/m3wd3bpSSDTG1mQqx13WB3qifEldw8NHjybVNiXRYdCDEu143Ms4qFePXc3fdMkQ9uqsuPd8dm4sjbPq9tSmzGx6tb2daO3IPR3G7T8T4pvr6p64iT8iEV5kyYrsjMP3lFVxqnPG71tFQXF/OkZ+aSMROHepuaR9wypSQxF6m6/t91cWhc3CjbXpjbnbzq7o1TSrrmoo04+iDfzLl3eeLeSB49NJuKkW+cUnJgxmVj16WpiVpX1JnOV3Y9IMWXmxk5snUDty72FgrdeTsC7VM8/ZVJk3XDi68r3Ww5TaKqOtX5vPIhhqS4umaY5BdBLZmyZ6/r6+TZ4+quh6S4zuz43JsfBHoEa+tyNarZvik7cWkGb9TK4M4Xr079eKjqeljKzqh0Rje4frYuqoMCU5xG+2uwLtm+qeV1oqbvgSluo6fegVTVbRvbLa2RNc89MKWQlBttrnRX6FJo1ZwPTHH74jfaXll8nTruj4Xa9z0wxWniSelQR38NF+p9jdSL5J6vWesCU7YWjyfjmR7E3F6/8O60XeezfVIKD+5bahL7pmcbc4e0GDtt943zwgJTCnJWDHe9mM1No/WV9ivqd9P5vjtHQ1MKHVn3U5uqOjG4uLksXij5nfgxufTncjGAqbe0hKY4ddaVrjPMHR6cM4Xe9nfdyR4pT9YN1vpcf6H3/Ln62W7T5T4plXWJGi9xa7sXxarwdl1V9xIpUXQ3mZw6u28nb5pUvUwKAAAAAAAAAAAAAAAAAAAAAAAAADzlHx9hucf0XZyvAAAAAElFTkSuQmCC" x="0" y="0" width="250" height="250" />
 					</svg>
 					<rect x="20" y="405" width="250" height="250" stroke="white" stroke-width="5" fill="transparent" />
@@ -279,6 +277,7 @@
 					</foreignObject>
 
 					<svg id="price-image-4"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="280" y="405" width="250" height="250">
+						<rect x="0" y="0" width="250" height="250" fill="white"></rect>
 						<image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6BAMAAAB6wkcOAAAAG1BMVEUvlrT19fVgrcR5ucyq0dzD3eSSxdTc6exHobyF7/hOAAAC90lEQVR4nO3WvU/bQBzGccdOTMYeENLRaTswBqWVOiZBhZVUonMsVXRtJNR2TKAq/bN7b07ujA0+RwyVvp8B45ff47vz+ZwoAgAAAAAAAAAAAAAAAAAAAAAAAAD8/+L319dfMvv/xBqb/ftP1xfZS6a8WwlpuNQ7qbC+693f+v9lg5u3TEnshcO12ut6dYl76kltU4o68etx3Zl7qtHdQ1MSMTw/vfsmxLHa64nhjbaUO33Z4I/RH/m3wd3bpSSDTG1mQqx13WB3qifEldw8NHjybVNiXRYdCDEu143Ms4qFePXc3fdMkQ9uqsuPd8dm4sjbPq9tSmzGx6tb2daO3IPR3G7T8T4pvr6p64iT8iEV5kyYrsjMP3lFVxqnPG71tFQXF/OkZ+aSMROHepuaR9wypSQxF6m6/t91cWhc3CjbXpjbnbzq7o1TSrrmoo04+iDfzLl3eeLeSB49NJuKkW+cUnJgxmVj16WpiVpX1JnOV3Y9IMWXmxk5snUDty72FgrdeTsC7VM8/ZVJk3XDi68r3Ww5TaKqOtX5vPIhhqS4umaY5BdBLZmyZ6/r6+TZ4+quh6S4zuz43JsfBHoEa+tyNarZvik7cWkGb9TK4M4Xr079eKjqeljKzqh0Rje4frYuqoMCU5xG+2uwLtm+qeV1oqbvgSluo6fegVTVbRvbLa2RNc89MKWQlBttrnRX6FJo1ZwPTHH74jfaXll8nTruj4Xa9z0wxWniSelQR38NF+p9jdSL5J6vWesCU7YWjyfjmR7E3F6/8O60XeezfVIKD+5bahL7pmcbc4e0GDtt943zwgJTCnJWDHe9mM1No/WV9ivqd9P5vjtHQ1MKHVn3U5uqOjG4uLksXij5nfgxufTncjGAqbe0hKY4ddaVrjPMHR6cM4Xe9nfdyR4pT9YN1vpcf6H3/Ln62W7T5T4plXWJGi9xa7sXxarwdl1V9xIpUXQ3mZw6u28nb5pUvUwKAAAAAAAAAAAAAAAAAAAAAAAAADzlHx9hucf0XZyvAAAAAElFTkSuQmCC" x="0" y="0" width="250" height="250" />
 					</svg>
 					<rect x="280" y="405" width="250" height="250" stroke="white" stroke-width="5" fill="transparent" />
@@ -291,6 +290,7 @@
 					</foreignObject>
 
 					<svg id="price-image-5"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="540" y="405" width="250" height="250">
+						<rect x="0" y="0" width="250" height="250" fill="white"></rect>
 						<image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6BAMAAAB6wkcOAAAAG1BMVEUvlrT19fVgrcR5ucyq0dzD3eSSxdTc6exHobyF7/hOAAAC90lEQVR4nO3WvU/bQBzGccdOTMYeENLRaTswBqWVOiZBhZVUonMsVXRtJNR2TKAq/bN7b07ujA0+RwyVvp8B45ff47vz+ZwoAgAAAAAAAAAAAAAAAAAAAAAAAAD8/+L319dfMvv/xBqb/ftP1xfZS6a8WwlpuNQ7qbC+693f+v9lg5u3TEnshcO12ut6dYl76kltU4o68etx3Zl7qtHdQ1MSMTw/vfsmxLHa64nhjbaUO33Z4I/RH/m3wd3bpSSDTG1mQqx13WB3qifEldw8NHjybVNiXRYdCDEu143Ms4qFePXc3fdMkQ9uqsuPd8dm4sjbPq9tSmzGx6tb2daO3IPR3G7T8T4pvr6p64iT8iEV5kyYrsjMP3lFVxqnPG71tFQXF/OkZ+aSMROHepuaR9wypSQxF6m6/t91cWhc3CjbXpjbnbzq7o1TSrrmoo04+iDfzLl3eeLeSB49NJuKkW+cUnJgxmVj16WpiVpX1JnOV3Y9IMWXmxk5snUDty72FgrdeTsC7VM8/ZVJk3XDi68r3Ww5TaKqOtX5vPIhhqS4umaY5BdBLZmyZ6/r6+TZ4+quh6S4zuz43JsfBHoEa+tyNarZvik7cWkGb9TK4M4Xr079eKjqeljKzqh0Rje4frYuqoMCU5xG+2uwLtm+qeV1oqbvgSluo6fegVTVbRvbLa2RNc89MKWQlBttrnRX6FJo1ZwPTHH74jfaXll8nTruj4Xa9z0wxWniSelQR38NF+p9jdSL5J6vWesCU7YWjyfjmR7E3F6/8O60XeezfVIKD+5bahL7pmcbc4e0GDtt943zwgJTCnJWDHe9mM1No/WV9ivqd9P5vjtHQ1MKHVn3U5uqOjG4uLksXij5nfgxufTncjGAqbe0hKY4ddaVrjPMHR6cM4Xe9nfdyR4pT9YN1vpcf6H3/Ln62W7T5T4plXWJGi9xa7sXxarwdl1V9xIpUXQ3mZw6u28nb5pUvUwKAAAAAAAAAAAAAAAAAAAAAAAAADzlHx9hucf0XZyvAAAAAElFTkSuQmCC" x="0" y="0" width="250" height="250" />
 					</svg>
 					<rect x="540" y="405" width="250" height="250" stroke="white" stroke-width="5" fill="transparent" />
@@ -381,6 +381,7 @@
 					</text>
 
 					<svg id="price-image-6"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="243" y="211" width="208" height="109">
+						<rect x="0" y="0" width="208" height="109" fill="white"></rect>
 						<image xlink:href="images/new/dummy-208x109.png" x="0" y="0" width="208" height="109" />
 					</svg>
 					<rect x="243" y="211" width="208" height="109" stroke="white" stroke-width="5" fill="transparent" />
@@ -470,6 +471,7 @@
 					</text>
 
 					<svg id="price-image-7"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="33" y="264" width="169" height="68">
+						<rect x="0" y="0" width="169" height="68" fill="white"></rect>
 						<image xlink:href="images/new/dummy-170x68.png" x="0" y="0" width="169" height="68"></image>
 					</svg>
 					<rect x="33" y="264" width="169" height="68" stroke="white" stroke-width="5" fill="transparent"></rect>
@@ -482,6 +484,7 @@
 					</foreignObject>
 
 					<svg id="price-image-8"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="208" y="264" width="169" height="68">
+						<rect x="0" y="0" width="169" height="68" fill="white"></rect>
 						<image xlink:href="images/new/dummy-170x68.png" x="0" y="0" width="169" height="68"></image>
 					</svg>
 					<rect x="210" y="264" width="169" height="68" stroke="white" stroke-width="5" fill="transparent"></rect>
@@ -570,6 +573,7 @@
 					</text>
 
 					<svg id="price-image-9"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="30" y="265" width="137" height="68">
+						<rect x="0" y="0" width="137" height="68" fill="white"></rect>
 						<image xlink:href="images/new/dummy-137x68.png" x="0" y="0" width="137" height="68"></image>
 					</svg>
 					<rect x="30" y="265" width="137" height="68" stroke="white" stroke-width="5" fill="transparent"></rect>
@@ -582,6 +586,7 @@
 					</foreignObject>
 
 					<svg id="price-image-10"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="178" y="265" width="137" height="68">
+						<rect x="0" y="0" width="137" height="68" fill="white"></rect>
 						<image xlink:href="images/new/dummy-137x68.png" x="0" y="0" width="137" height="68"></image>
 					</svg>
 					<rect x="178" y="265" width="137" height="68" stroke="white" stroke-width="5" fill="transparent"></rect>
@@ -594,6 +599,7 @@
 					</foreignObject>
 
 					<svg id="price-image-11"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="324" y="265" width="137" height="68">
+						<rect x="0" y="0" width="137" height="68" fill="white"></rect>
 						<image xlink:href="images/new/dummy-137x68.png" x="0" y="0" width="137" height="68"></image>
 					</svg>
 					<rect x="324" y="265" width="137" height="68" stroke="white" stroke-width="5" fill="transparent"></rect>

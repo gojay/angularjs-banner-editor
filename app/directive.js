@@ -32,7 +32,7 @@ angular.module('BannerComponents', [])
 					var maxW = parseInt(w - data.dimension.width),
 						maxH = parseInt(h - data.dimension.height);
 					// helper
-					var toggleEl = (data.priceBottom) ? '#logo, #description' : '#logo, #description, #price' ;
+					var toggleEl = (data.pricesInBottom) ? '#logo, #description' : '#logo, #description, #price' ;
 					var top, x, y = 0;
 					// set draggable element
 					var $bgDraggable = $('#background > rect', $svg).eq(0);
@@ -73,13 +73,15 @@ angular.module('BannerComponents', [])
 				});
 
 				var displayTpl = true;
-				$scope.displayTpl = function($event){
-					var displaySVG = $($event.currentTarget).val();
+				$scope.displayTpl = function(evt, displaySVG){
+					$(evt.currentTarget).parent().children().each(function(i, e){
+						$(e).attr('disabled',false);
+					});
+					$(evt.currentTarget).attr('disabled',true);
 					if(displaySVG == 'both'){
 						$('#svg-editor > svg').each(function(i, e){ $(e).show(); });
 						return;
 					}
-
 					displayTpl = false;
 					$('#svg-editor > svg').each(function(i, e){ $(e).hide(); });
 					$('#svg-editor > svg#svg-editor-'+displaySVG).show();

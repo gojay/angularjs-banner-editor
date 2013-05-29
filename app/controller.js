@@ -162,16 +162,16 @@ angular.module('BannerControllers', [])
 			var $svgEditor       = $('#svg-editor');
 			var $actEditor       = $('#action-editor');
 			var $liActive        = $('ul > li.active > a', $templateField);
-			var priceBottom      = $liActive.data('priceBottom');
+			var pricesInBottom   = $liActive.data('priceBottom');
 			var tplDimension     = $liActive.data('tpl');
 			var tplShowPrice     = $scope.tplShowPrice = $liActive.data('price').match(/(\d)/)[0];
 			
 			var settings = {
 				field : {
-					template : $templateField,
-					setting  : $settingField,
+					template   : $templateField,
+					setting    : $settingField,
 					displayTpl : $displayTplField,
-					content  : $contentField
+					content    : $contentField
 				},
 				btn: {
 					template : $btnTemplate,
@@ -182,9 +182,9 @@ angular.module('BannerControllers', [])
 					action : $actEditor
 				},
 				attributes : {
-					tplDimension : tplDimension,
-					priceBottom  : priceBottom,
-					tplShowPrice : tplShowPrice
+					tplDimension    : tplDimension,
+					pricesInBottom  : pricesInBottom,
+					tplShowPrice    : tplShowPrice
 				}
 			};
 
@@ -243,7 +243,7 @@ angular.module('BannerControllers', [])
 			var $editorSVG    = options.editor.svg;
 			var $editorAction = options.editor.action;
 			var tplDimension  = options.attributes.tplDimension;
-			var priceBottom   = options.attributes.priceBottom;
+			var pricesInBottom = options.attributes.pricesInBottom;
 			var tplShowPrice  = options.attributes.tplShowPrice;
 
 			console.log('settings', options);
@@ -255,6 +255,13 @@ angular.module('BannerControllers', [])
 				$('input[type="file"]', $settingField).each(function(e,i){
 					$(this).val('');
 				});
+				// remove imgareaselect
+				if($('#temp-crop-image').length){
+					$(".imgareaselect-selection").parent().remove();
+					$(".imgareaselect-outer").remove();
+					$('#temp-crop-image').remove();
+					$('#crop-handle').remove();
+				} 
 			}
 
 			// canvas dimensions
@@ -295,14 +302,15 @@ angular.module('BannerControllers', [])
 					imageReader.init({
 						dropArea      : '#drop-background',
 						inputFileEl   : '#input-background',
-						inputFileText : 'Add Background',
+						inputFileText : 'Select an image',
 						section       : 'background',
 						compile       : function(buttonEl, changeEl, image){
 							console.log('changeEl', changeEl);
 
-							if(image.width == backgroundDimension.width && image.height == backgroundDimension.height){
+							var labelEl = $(buttonEl).parent().siblings('label')[0];
+							if(image.width <= backgroundDimension.width && image.height <= backgroundDimension.height){
 								// change the button text to 'Edit'
-								buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
+								labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
 								// re-compile to injecting scope
 								for(var i in changeEl){
 									changeEl[i].setAttribute('xlink:href',image.src);
@@ -311,12 +319,12 @@ angular.module('BannerControllers', [])
 									changeEl[i].setAttribute('x', -Math.abs(cropSelection.x1));
 									changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
 								}
-								// bgReposition
+								// background reposition
 								$editorAction.show();
 								$('body').trigger('bgReposition', {
 									svg         : $svg,
 									imageBG     : changeEl,
-									priceBottom : priceBottom,
+									pricesInBottom : pricesInBottom,
 									dimension   : backgroundDimension
 								});
 								return;
@@ -325,7 +333,7 @@ angular.module('BannerControllers', [])
 							// define crop selection
 							var cropSelection = {};
 							// create temporary image fro cropping
-							$(image).attr('id', 'tempImage');
+							$(image).attr('id', 'temp-crop-image');
 							// append to body
 							$('body').append($(image));
 							// calculating crop center
@@ -339,7 +347,7 @@ angular.module('BannerControllers', [])
 							};
 							// show crop popup
 							$.blockUI({
-								message: $('#tempImage'),
+								message: $('#temp-crop-image'),
 								overlayCSS:{
 									cursor : 'default'
 								},
@@ -351,7 +359,7 @@ angular.module('BannerControllers', [])
 									width  : image.width + 'px'
 								},
 								onBlock: function(){
-									$('#tempImage').imgAreaSelect({
+									$('#temp-crop-image').imgAreaSelect({
 										x1 : pos.x1,
 										y1 : pos.y1,
 										x2 : pos.x2,
@@ -388,10 +396,10 @@ angular.module('BannerControllers', [])
 										// remove imgAreaSelect
 										$(".imgareaselect-selection").parent().remove();
 										$(".imgareaselect-outer").remove();
-										$('#tempImage').remove();
+										$('#temp-crop-image').remove();
 										$('#crop-handle').remove();
 										// change the button text to 'Edit'
-										buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
+										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
 										// re-compile to injecting scope
 										for(var i in changeEl){
 											changeEl[i].setAttribute('xlink:href',image.src);
@@ -405,7 +413,7 @@ angular.module('BannerControllers', [])
 										$('body').trigger('bgReposition', {
 											svg         : $svg,
 											imageBG     : changeEl,
-											priceBottom : priceBottom,
+											pricesInBottom : pricesInBottom,
 											dimension   : backgroundDimension
 										});
 									}
@@ -418,7 +426,7 @@ angular.module('BannerControllers', [])
 										// remove imgAreaSelect
 										$(".imgareaselect-selection").parent().remove();
 										$(".imgareaselect-outer").remove();
-										$('#tempImage').remove();
+										$('#temp-crop-image').remove();
 										$('#crop-handle').remove();
 									}
 								});
@@ -428,7 +436,7 @@ angular.module('BannerControllers', [])
 					imageReader.init({
 						dropArea      : '#drop-logo',
 						inputFileEl   : '#input-logo',
-						inputFileText : 'Add Logo',
+						inputFileText : 'Select an image',
 						section       : 'logo',
 						compile       : function(buttonEl, changeEl, image){
 							// change text button input file
@@ -476,24 +484,24 @@ angular.module('BannerControllers', [])
 
 					// callback price compile
 					var priceCompile = function(buttonEl, changeEl, image){
-						/*// change text button input file
-						buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
-						// set image src
-						angular.forEach(changeEl, function(e,i){
-							console.log(e);
-							e.setAttribute('xlink:href',image.src);
-							e.setAttribute('width',image.width);
-							e.setAttribute('height',image.height);
-						});*/
 						
-						// change text button input file
-						buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
+						var labelEl = $(buttonEl).parent().siblings('label')[0];
+						if(image.width <= backgroundDimension.width && image.height <= backgroundDimension.height)
+						{
+							// change label text
+							labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
+							// re-compile to injecting scope
+							angular.forEach(changeEl, function(e,i){
+								e.setAttribute('xlink:href',image.src);
+							});
+							return;
+						}
 						// define crop selection
 						var cropSelection = {};
 						// create temporary image fro cropping
-						$(image).attr('id', 'tempImage');
+						image.setAttribute('id', 'temp-crop-image');
 						// append to body
-						$('body').append($(image));
+						document.getElementsByTagName('body')[0].appendChild(image);
 						// calculating crop center
 						var x1 = parseInt((image.width - logoDimension.width) / 2);
 						var y1 = parseInt((image.height - logoDimension.height) / 2);
@@ -505,7 +513,7 @@ angular.module('BannerControllers', [])
 						};
 						// show crop popup
 						$.blockUI({
-							message: $('#tempImage'),
+							message: $('#temp-crop-image'),
 							overlayCSS:{
 								cursor : 'default'
 							},
@@ -517,7 +525,7 @@ angular.module('BannerControllers', [])
 								width  : image.width + 'px'
 							},
 							onBlock: function(){
-								$('#tempImage').imgAreaSelect({
+								$('#temp-crop-image').imgAreaSelect({
 									x1 : pos.x1,
 									y1 : pos.y1,
 									x2 : pos.x2,
@@ -529,7 +537,7 @@ angular.module('BannerControllers', [])
 										console.log('imgAreaSelect init', 'x', -selection.x1, 'y', -selection.y1);
 										// set cropSelection
 										cropSelection = selection;
-										var $handle = $('.imgareaselect-handle').last().parent();
+										var $handle = $('.imgareaselect-handle').parent();
 										$handle.parent().append($compile('<div id="crop-handle"><button class="btn btn-primary" ng-click="doCrop()"><i class="icon-crop"></i> Crop</button><button class="btn" ng-click="cancelCrop()">Cancel</button></div>')($scope));
 									},
 									onSelectStart : function(){
@@ -554,8 +562,10 @@ angular.module('BannerControllers', [])
 									// remove imgAreaSelect
 									$(".imgareaselect-selection").parent().remove();
 									$(".imgareaselect-outer").remove();
-									$('#tempImage').remove();
+									$('#temp-crop-image').remove();
 									$('#crop-handle').remove();
+									// change label text
+									labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
 									// set image src
 									angular.forEach(changeEl, function(e,i){
 										console.log(e);
@@ -575,7 +585,7 @@ angular.module('BannerControllers', [])
 									// remove imgAreaSelect
 									$(".imgareaselect-selection").parent().remove();
 									$(".imgareaselect-outer").remove();
-									$('#tempImage').remove();
+									$('#temp-crop-image').remove();
 									$('#crop-handle').remove();
 								}
 							});
@@ -585,21 +595,21 @@ angular.module('BannerControllers', [])
 					imageReader.init({
 						dropArea      : '#drop-price-1',
 						inputFileEl   : '#input-price-1',
-						inputFileText : 'Add Price 1',
+						inputFileText : 'Select an image',
 						section       : 'price-1',
 						compile       : priceCompile
 					});
 					imageReader.init({
 						dropArea      : '#drop-area',
 						inputFileEl   : '#input-price-2',
-						inputFileText : 'Add Price 2',
+						inputFileText : 'Select an image',
 						section       : 'price-2',
 						compile       : priceCompile
 					});
 					imageReader.init({
 						dropArea      : '#drop-area',
 						inputFileEl   : '#input-price-3',
-						inputFileText : 'Add Price 3',
+						inputFileText : 'Select an image',
 						section       : 'price-3',
 						compile       : priceCompile
 					});
