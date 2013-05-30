@@ -213,7 +213,7 @@ angular.module('BannerControllers', [])
 			if($templateField.is(':hidden')){
 				$templateField.show(400, function(){
 					$btnCancel.show();
-					$btnTemplate.addClass('overwrite').text('Settings');
+					$btnTemplate.addClass('overwrite').html('<i class="icon-cog"></i> Settings');
 					$contentField.show();
 					$settingField.hide();
 					$displayTplField.hide();
@@ -255,13 +255,6 @@ angular.module('BannerControllers', [])
 				$('input[type="file"]', $settingField).each(function(e,i){
 					$(this).val('');
 				});
-				// remove imgareaselect
-				if($('#temp-crop-image').length){
-					$(".imgareaselect-selection").parent().remove();
-					$(".imgareaselect-outer").remove();
-					$('#temp-crop-image').remove();
-					$('#crop-handle').remove();
-				} 
 			}
 
 			// canvas dimensions
@@ -276,7 +269,7 @@ angular.module('BannerControllers', [])
 				$(this).hide();
 				$tplContent.hide();
 				$btnCancel.hide();
-				$btnTemplate.text('Choose template');
+				$btnTemplate.html('<i class="icon-list"></i> Choose template');
 
 				$settingField.show(400,function(){
 					$displayTpl.show();
@@ -298,7 +291,8 @@ angular.module('BannerControllers', [])
 
 					// show editor
 					if($editorSVG.is(':hidden')) $editorSVG.show();
-					// initialize image reader 
+					/* initialize image reader */
+					// background
 					imageReader.init({
 						dropArea      : '#drop-background',
 						inputFileEl   : '#input-background',
@@ -310,14 +304,12 @@ angular.module('BannerControllers', [])
 							var labelEl = $(buttonEl).parent().siblings('label')[0];
 							if(image.width <= backgroundDimension.width && image.height <= backgroundDimension.height){
 								// change the button text to 'Edit'
-								labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+								labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
 								// re-compile to injecting scope
 								for(var i in changeEl){
 									changeEl[i].setAttribute('xlink:href',image.src);
 									changeEl[i].setAttribute('width', image.width);
 									changeEl[i].setAttribute('height', image.height);
-									changeEl[i].setAttribute('x', -Math.abs(cropSelection.x1));
-									changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
 								}
 								// background reposition
 								$editorAction.show();
@@ -332,10 +324,11 @@ angular.module('BannerControllers', [])
 
 							// define crop selection
 							var cropSelection = {};
-							// create temporary image fro cropping
-							$(image).attr('id', 'temp-crop-image');
+							// create temporary image for cropping
+							image.setAttribute('id', 'temp-crop-image hide');
 							// append to body
-							$('body').append($(image));
+							document.querySelector('body').appendChild(image);
+							var $tempImg = $(image);
 							// calculating crop center
 							var x1 = parseInt((image.width - backgroundDimension.width) / 2);
 							var y1 = parseInt((image.height - backgroundDimension.height) / 2);
@@ -347,7 +340,7 @@ angular.module('BannerControllers', [])
 							};
 							// show crop popup
 							$.blockUI({
-								message: $('#temp-crop-image'),
+								message   : $tempImg,
 								overlayCSS:{
 									cursor : 'default'
 								},
@@ -359,7 +352,7 @@ angular.module('BannerControllers', [])
 									width  : image.width + 'px'
 								},
 								onBlock: function(){
-									$('#temp-crop-image').imgAreaSelect({
+									$tempImg.imgAreaSelect({
 										x1 : pos.x1,
 										y1 : pos.y1,
 										x2 : pos.x2,
@@ -371,8 +364,8 @@ angular.module('BannerControllers', [])
 											console.log('imgAreaSelect init', 'x', -selection.x1, 'y', -selection.y1);
 											// set cropSelection
 											cropSelection = selection;
-											var $handle = $('.imgareaselect-handle').last().parent();
-											$handle.parent().append($compile('<div id="crop-handle"><button class="btn btn-primary" ng-click="doCrop()"><i class="icon-crop"></i> Crop</button><button class="btn" ng-click="cancelCrop()">Cancel</button></div>')($scope));
+											var $handle = $('.imgareaselect-handle').parent();
+											$handle.parent().append($compile('<div id="crop-wrapper"><button class="btn btn-primary" ng-click="cropHandle(\'do\')"><i class="icon-crop"></i> Crop</button><button class="btn" ng-click="cropHandle(\'cancel\')">Cancel</button></div>')($scope));
 										},
 										onSelectStart : function(){
 											console.log('imgAreaSelect start');
@@ -389,50 +382,31 @@ angular.module('BannerControllers', [])
 									});
 								}
 							});
-							// do crop
-							$scope.doCrop = function(){
+							$scope.cropHandle = function(act){
+								// remove imgAreaSelect
+								$tempImg.imgAreaSelect({remove:true});
 								$.unblockUI({
 									onUnblock: function() {
-										// remove imgAreaSelect
-										$(".imgareaselect-selection").parent().remove();
-										$(".imgareaselect-outer").remove();
-										$('#temp-crop-image').remove();
-										$('#crop-handle').remove();
-										// change the button text to 'Edit'
-										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
-										// re-compile to injecting scope
-										for(var i in changeEl){
-											changeEl[i].setAttribute('xlink:href',image.src);
-											changeEl[i].setAttribute('width', image.width);
-											changeEl[i].setAttribute('height', image.height);
-											changeEl[i].setAttribute('x', -Math.abs(cropSelection.x1));
-											changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
+										if(act == 'do'){
+											// change the button text to 'Edit'
+											labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
+											// change image src, dimension n position
+											for(var i in changeEl){
+												changeEl[i].setAttribute('xlink:href',image.src);
+												changeEl[i].setAttribute('width', image.width);
+												changeEl[i].setAttribute('height', image.height);
+												changeEl[i].setAttribute('x', -Math.abs(cropSelection.x1));
+												changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
+											}
 										}
-										// bgReposition
-										$editorAction.show();
-										$('body').trigger('bgReposition', {
-											svg         : $svg,
-											imageBG     : changeEl,
-											pricesInBottom : pricesInBottom,
-											dimension   : backgroundDimension
-										});
-									}
-								});
-							};
-							// cancel crop
-							$scope.cancelCrop = function(){
-								$.unblockUI({
-									onUnblock: function() {
-										// remove imgAreaSelect
-										$(".imgareaselect-selection").parent().remove();
-										$(".imgareaselect-outer").remove();
-										$('#temp-crop-image').remove();
-										$('#crop-handle').remove();
+										$tempImg.remove();
+										$('#crop-wrapper').remove();
 									}
 								});
 							};
 						}
 					});
+					// logo
 					imageReader.init({
 						dropArea      : '#drop-logo',
 						inputFileEl   : '#input-logo',
@@ -440,7 +414,7 @@ angular.module('BannerControllers', [])
 						section       : 'logo',
 						compile       : function(buttonEl, changeEl, image){
 							// change text button input file
-							buttonEl.innerHTML = buttonEl.innerHTML.replace(/add/i, 'Edit');
+							buttonEl.innerHTML = buttonEl.innerHTML.replace(/upload/i, 'Edit');
 							// re-compile to injecting scope
 							angular.forEach(changeEl, function(e,i){
 								var logo = {
@@ -484,8 +458,8 @@ angular.module('BannerControllers', [])
 
 					// callback price compile
 					var priceCompile = function(buttonEl, changeEl, image){
-						
 						var labelEl = $(buttonEl).parent().siblings('label')[0];
+						// auto strecth, if image dimension less than background dimension
 						if(image.width <= backgroundDimension.width && image.height <= backgroundDimension.height)
 						{
 							// change label text
@@ -498,10 +472,11 @@ angular.module('BannerControllers', [])
 						}
 						// define crop selection
 						var cropSelection = {};
-						// create temporary image fro cropping
+						// create temporary image for cropping
 						image.setAttribute('id', 'temp-crop-image');
 						// append to body
-						document.getElementsByTagName('body')[0].appendChild(image);
+						document.querySelector('body').appendChild(image);
+						var $tempImg = $(image);
 						// calculating crop center
 						var x1 = parseInt((image.width - logoDimension.width) / 2);
 						var y1 = parseInt((image.height - logoDimension.height) / 2);
@@ -513,7 +488,7 @@ angular.module('BannerControllers', [])
 						};
 						// show crop popup
 						$.blockUI({
-							message: $('#temp-crop-image'),
+							message   : $tempImg,
 							overlayCSS:{
 								cursor : 'default'
 							},
@@ -525,7 +500,7 @@ angular.module('BannerControllers', [])
 								width  : image.width + 'px'
 							},
 							onBlock: function(){
-								$('#temp-crop-image').imgAreaSelect({
+								$tempImg.imgAreaSelect({
 									x1 : pos.x1,
 									y1 : pos.y1,
 									x2 : pos.x2,
@@ -538,7 +513,7 @@ angular.module('BannerControllers', [])
 										// set cropSelection
 										cropSelection = selection;
 										var $handle = $('.imgareaselect-handle').parent();
-										$handle.parent().append($compile('<div id="crop-handle"><button class="btn btn-primary" ng-click="doCrop()"><i class="icon-crop"></i> Crop</button><button class="btn" ng-click="cancelCrop()">Cancel</button></div>')($scope));
+										$handle.parent().append($compile('<div id="crop-wrapper"><button class="btn btn-primary" ng-click="cropHandle(\'do\')"><i class="icon-crop"></i> Crop</button><button class="btn btn-primary" ng-click="cropHandle(\'fit\')"><i class="icon-resize-horizontal"></i> Auto Fit</button><button class="btn" ng-click="cropHandle(\'cancel\')">Cancel</button></div>')($scope));
 									},
 									onSelectStart : function(){
 										console.log('imgAreaSelect start');
@@ -555,43 +530,37 @@ angular.module('BannerControllers', [])
 								});
 							}
 						});
-						// do crop
-						$scope.doCrop = function(){
+						$scope.cropHandle = function(act){
+							$tempImg.imgAreaSelect({remove:true});
 							$.unblockUI({
 								onUnblock: function() {
-									// remove imgAreaSelect
-									$(".imgareaselect-selection").parent().remove();
-									$(".imgareaselect-outer").remove();
-									$('#temp-crop-image').remove();
-									$('#crop-handle').remove();
-									// change label text
-									labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
-									// set image src
-									angular.forEach(changeEl, function(e,i){
-										console.log(e);
-										e.setAttribute('xlink:href',image.src);
-										e.setAttribute('width',image.width);
-										e.setAttribute('height',image.height);
-										e.setAttribute('x', -Math.abs(cropSelection.x1));
-										e.setAttribute('y', -Math.abs(cropSelection.y1));
-									});
-								}
-							});
-						};
-						// cancel crop
-						$scope.cancelCrop = function(){
-							$.unblockUI({
-								onUnblock: function() {
-									// remove imgAreaSelect
-									$(".imgareaselect-selection").parent().remove();
-									$(".imgareaselect-outer").remove();
-									$('#temp-crop-image').remove();
-									$('#crop-handle').remove();
+									if(act == 'do'){
+										// change the button text to 'Edit'
+										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+										// change image src, dimension n position
+										for(var i in changeEl){
+											changeEl[i].setAttribute('xlink:href',image.src);
+											changeEl[i].setAttribute('width', image.width);
+											changeEl[i].setAttribute('height', image.height);
+											changeEl[i].setAttribute('x', -Math.abs(cropSelection.x1));
+											changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
+										}
+									}
+									else if(act == 'fit'){
+										// change the button text to 'Edit'
+										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+										// change image src only
+										for(var j in changeEl){
+											changeEl[j].setAttribute('xlink:href',image.src);
+										}
+									}
+									$tempImg.remove();
+									$('#crop-wrapper').remove();
 								}
 							});
 						};
 					};
-
+					// prizes
 					imageReader.init({
 						dropArea      : '#drop-price-1',
 						inputFileEl   : '#input-price-1',

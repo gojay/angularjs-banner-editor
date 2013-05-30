@@ -83,7 +83,16 @@ angular.module('BannerProvider', [])
 					// create the button input file ID
 					var buttonFileId = config.inputFileEl + '-button';
 					// check the button input file
-					if($(buttonFileId).length) $(buttonFileId).remove();
+					if($(buttonFileId).length) {
+						$(buttonFileId).remove();
+						var $parent = $(config.inputFileEl).parent();
+						$(config.inputFileEl).remove();
+						var inputFile = document.createElement('input');
+						inputFile.setAttribute('type', 'file');
+						inputFile.setAttribute('id', config.inputFileEl.replace(/\#/, ''));
+						inputFile.setAttribute('class', 'hide');
+						$parent.append(inputFile.outerHTML);
+					}
 					if($(config.inputFileEl).is(':visible')) $(config.inputFileEl).addClass('hide');
 					// create the button input file
 					var buttonField = document.createElement('button');
