@@ -595,9 +595,6 @@ angular.module('BannerControllers', [])
 						return 'editor-'+type;
 					});
 				});
-				// if( $(e).find('image').length ){
-				// 	$(e).find('image').attr('id', 'background-image-editor-'+type);
-				// }
 			});
 			$('#shadow', $svg).children().map(function(i,e){
 				$(e).attr('id', function(index, id){
@@ -607,13 +604,32 @@ angular.module('BannerControllers', [])
 				});
 			});
 			$('#background', $svg).children().map(function(i,e){
-				if($(e).attr('fill') === undefined) return;
-				if(i == 1 && type == 'enter') $(e).remove();
-				$(e).attr('fill', function(index, id){
-					return id.replace(/(\d+)/, function(fullMatch, n) {
-						return 'editor-'+type;
+				if($(e).attr('fill')) {
+					// if(type == 'enter') $(e).remove();
+					$(e).attr('fill', function(index, id){
+						return id.replace(/(\d+)/, function(fullMatch, n) {
+							return 'editor-'+type;
+						});
 					});
-				});
+				}
+				else {
+					e.setAttribute('width', '{{banner.fb.w}}');
+					e.setAttribute('height', '{{banner.fb.h}}');
+					e.setAttribute('x', '{{getX()}}');
+					// compile banner fb 
+					$scope.banner.fb = {
+						w:283,
+						h:67
+					};
+					$scope.$watch('banner.fb.w', function(input){
+						var ratio = [input / 283, 67 / 67];
+						var aspectRatio = Math.min(ratio[0], ratio[1]);
+						$scope.banner.fb.h = parseInt(67 * aspectRatio);
+					});
+					$scope.getX = function(){
+						return 810 - $scope.banner.fb.w;
+					}
+				}
 			});
 			$('#logo', $svg).children().map(function(i,e){
 				if($(e).attr('id') !== undefined) {
@@ -646,6 +662,7 @@ angular.module('BannerControllers', [])
 				});
 				_index++;
 			});
+
 			return $compile($svg)($scope);
 		};
 
@@ -742,6 +759,7 @@ angular.module('BannerControllers', [])
 										'</div>' +
 									'</li>';
 					// append banner images
+					$generate.find('ul').html('');
 					$generate.find('ul').append(tplImages);
 					// open popup
 					setTimeout(function() {
@@ -843,33 +861,5 @@ angular.module('BannerControllers', [])
 			// 	}, 300);
 			// };
 			// imgLike.src = "data:image/svg+xml;base64," + btoa(svg_xml);
-		};
-
-		$scope.test = function(evt){
-			var self = evt.currentTarget;
-			$.blockUI({
-				timeout: 3000,
-				message: $('#loading-problem'),
-				css: {
-					background : 'transparent',
-					border     : 'none',
-					top        : ($(window).height() - 350) / 2 + 'px',
-					left       : ($(window).width() - 375) / 2 + 'px',
-					width      : '350px'
-				},
-				onUnblock: function() {
-					$.blockUI({
-						border    : '1px solid #0044cc',
-						message   : $('#result'),
-						css : {
-							cursor: 'default',
-							top   : ($(window).height() - $('#result').height()) / 2 + 'px',
-							left  : ($(window).width() - $('#result').width()) / 2 + 'px',
-							width : $('#result').width() + 'px'
-						}
-					});
-					$('.blockOverlay').attr('title','Click to cancel').click($.unblockUI);
-				}
-			});
 		};
 	});
