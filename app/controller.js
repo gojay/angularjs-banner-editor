@@ -605,7 +605,6 @@ angular.module('BannerControllers', [])
 			});
 			$('#background', $svg).children().map(function(i,e){
 				if($(e).attr('fill')) {
-					// if(type == 'enter') $(e).remove();
 					$(e).attr('fill', function(index, id){
 						return id.replace(/(\d+)/, function(fullMatch, n) {
 							return 'editor-'+type;
@@ -630,6 +629,7 @@ angular.module('BannerControllers', [])
 						return 810 - $scope.banner.fb.w;
 					}
 				}
+				if(i == 1 && type == 'enter') $(e).remove();
 			});
 			$('#logo', $svg).children().map(function(i,e){
 				if($(e).attr('id') !== undefined) {
