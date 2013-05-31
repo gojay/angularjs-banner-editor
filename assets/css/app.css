@@ -2,6 +2,10 @@ html {
 	height: 100%;
 }
 
+a:hover {
+	text-decoration: none;
+}
+
 .full-height {
 	height: 100%;
 }

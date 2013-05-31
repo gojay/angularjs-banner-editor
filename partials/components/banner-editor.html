@@ -1,11 +1,11 @@
 <div id="banner-editor" >
-	<h3 class="span9">Design Preview</h3>
-	<div id="display-tpl" class="hide span3 btn-group margin-top-bottom">
+	<h3 class="span8" style="margin-top:0;">Design Preview</h3>
+	<div id="display-tpl" class="hide span4 btn-group text-center">
 	    <button class="btn" ng-click="displayTpl($event, 'like')">Like</button>
 	    <button class="btn" ng-click="displayTpl($event, 'both')" disabled="true">Both</button>
 	    <button class="btn" ng-click="displayTpl($event, 'enter')">Enter</button>
 	</div>
-	<div class="span12 tab-content">
+	<div class="span12 prefix tab-content">
 		<div class="tab-pane active" id="svg-tpl-1">
 			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="810" height="381">
 				<defs>
@@ -628,11 +628,13 @@
 
 	<div id="svg-editor"></div>
 
+	<div id="canvas"></div>
+
 	<div id="drop-background" class="drop-area" data-title="Drop Background Here"></div>
 	<div id="drop-logo" class="drop-area" data-title="Drop Logo Here"></div>
 	<div id="drop-price-1" class="drop-area" data-title="Drop Price Here"></div>
 
-	<div id="action-editor" class="hide margin-top-bottom">
+	<div id="action-editor" class="span12 prefix margin-top-bottom hide">
 		<button class="btn btn-block btn-primary" type="button" ng-click="doBGReposition($event)"><i class="icon-move"></i> Background Reposition</button>
 	</div>
 	

@@ -72,8 +72,6 @@ angular.module('BannerProvider', [])
 						compile       : null
 					};
 
-					// console.log('options', options);
-
 					/* auto merging default options */
 
 					var config = self.config = $.extend({}, defaults, options);

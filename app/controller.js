@@ -247,6 +247,8 @@ angular.module('BannerControllers', [])
 			var tplShowPrice  = options.attributes.tplShowPrice;
 
 			console.log('settings', options);
+			// tooltip
+			$('a').tooltip();
 
 			if( overwrite ){
 				// remove class overwrite
@@ -269,7 +271,7 @@ angular.module('BannerControllers', [])
 				$(this).hide();
 				$tplContent.hide();
 				$btnCancel.hide();
-				$btnTemplate.html('<i class="icon-list"></i> Choose template');
+				$btnTemplate.html('<i class="icon-list"></i> Choose Template');
 
 				$settingField.show(400,function(){
 					$displayTpl.show();
@@ -311,14 +313,6 @@ angular.module('BannerControllers', [])
 									changeEl[i].setAttribute('width', image.width);
 									changeEl[i].setAttribute('height', image.height);
 								}
-								// background reposition
-								$editorAction.show();
-								$('body').trigger('bgReposition', {
-									svg         : $svg,
-									imageBG     : changeEl,
-									pricesInBottom : pricesInBottom,
-									dimension   : backgroundDimension
-								});
 								return;
 							}
 
@@ -387,6 +381,8 @@ angular.module('BannerControllers', [])
 								$tempImg.imgAreaSelect({remove:true});
 								$.unblockUI({
 									onUnblock: function() {
+										$tempImg.remove();
+										$('#crop-wrapper').remove();
 										if(act == 'do'){
 											// change the button text to 'Edit'
 											labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
@@ -398,9 +394,15 @@ angular.module('BannerControllers', [])
 												changeEl[i].setAttribute('x', -Math.abs(cropSelection.x1));
 												changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
 											}
+											// background reposition
+											$editorAction.show();
+											$('body').trigger('bgReposition', {
+												svg         : $svg,
+												imageBG     : changeEl,
+												pricesInBottom : pricesInBottom,
+												dimension   : backgroundDimension
+											});
 										}
-										$tempImg.remove();
-										$('#crop-wrapper').remove();
 									}
 								});
 							};
@@ -722,7 +724,7 @@ angular.module('BannerControllers', [])
 				downloadLinkLike.href      = imgDataURILike;
 				downloadLinkLike.target    = '_blank';
 				downloadLinkLike.className = 'btn btn-success';
-				downloadLinkLike.innerHTML = 'Download Banner Like';
+				downloadLinkLike.innerHTML = '<i class="icon-download-alt"></i> Download Banner Like';
 				downloadLinkLike.download  = 'banner-like.png';
 				// create canvas banner enter
 				createCanvas(svg_enter, canvasDimensions, function(imgEnter, imgDataURIEnter){
@@ -732,7 +734,7 @@ angular.module('BannerControllers', [])
 					downloadLinkEnter.href      = imgDataURIEnter;
 					downloadLinkEnter.target    = '_blank';
 					downloadLinkEnter.className = 'btn btn-success';
-					downloadLinkEnter.innerHTML = 'Download Banner Enter';
+					downloadLinkEnter.innerHTML = '<i class="icon-download-alt"></i> Download Banner Enter';
 					downloadLinkEnter.download  = 'banner-enter.png';
 					// set image class
 					imgLike.className  = 'span12';
@@ -767,6 +769,7 @@ angular.module('BannerControllers', [])
 							onUnblock: function() {
 								$.blockUI({
 									overlayCSS:{
+										cursor : 'pointer',
 										border : '3px solid #006DCC'
 									},
 									message: $generate,
@@ -781,85 +784,51 @@ angular.module('BannerControllers', [])
 								$('.blockOverlay').attr('title', 'Click to cancel').click($.unblockUI);
 							}
 						});
-					}, 3000);
+					}, 1000);
 				});
-			})
-			// get svg n convert foreignobject to xml
-			// var svg_like = $('#svg-editor > svg').eq(0)[0];
-			// var svg_xml_like = (new XMLSerializer()).serializeToString(svg_like);
-			// var svg_enter = $('#svg-editor > svg').eq(1)[0];
-			// var svg_xml_enter = (new XMLSerializer()).serializeToString(svg_enter);
-			// // get canvas dimensions
-			// var canvasDimensions = JSON.parse($('input[name="canvasDimensions"]').val());
-			// // create canvas
-			// var canvas    = document.createElement('canvas');
-			// canvas.width  = canvasDimensions.width;
-			// canvas.height = canvasDimensions.height;
-			// // get canvas context
-			// var ctx = canvas.getContext("2d");
-			// // Base64-encode the XML as data URL
-			// var imgLike = new Image();
-			// imgLike.onload = function(){
-			// 	// drawing canvas image
-			// 	// ctx.drawImage(imgLike, 0, 0);
-			// 	// convert canvas to datauri
-			// 	var imgDataURI = canvas.toDataURL('image/png');
-			// 	// create anchor element
-			// 	var downloadLink       = document.createElement('a');
-			// 	downloadLink.title     = 'Download banner';
-			// 	downloadLink.href      = imgDataURI;
-			// 	downloadLink.target    = '_blank';
-			// 	downloadLink.className = 'btn btn-success';
-			// 	downloadLink.innerHTML = 'Download banner';
-			// 	downloadLink.download  = 'banner.png';
-			// 	// append canvas n anchor
-			// 	// $('#svg-editor')
-			// 	// 	.append(canvas)
-			// 	// 	.append(downloadLink);
-			// 	// window.open(canvas.toDataURL('image/png'));
-			// 	imgLike.className = 'span12';
+			});
+		};
 
-			// 	var imgEnter = new Image();
-			// 	imgEnter.onload = function(){
+		// http://stackoverflow.com/questions/3142007/how-to-either-determine-svg-text-box-width-or-force-line-breaks-after-x-chara
+		// http://documentup.com/wout/svg.js
+		// https://github.com/wout/svg.textflow.js
+		$scope.foreignToSVGXML = function(evt){
+			var $svg = $('#svg-editor > svg').eq(0);
+			var description   = $('#description', $svg)[0];
+			var foreignobject = $('#description > .foreign-object', $svg)[0];
+			var titles = $(foreignobject).find('h3').html().split(/<br[^>]*>/gi);
+			var p = $(foreignobject).find('p').html();
 
-			// 	};
-			// 	imgEnter.src = "data:image/svg+xml;base64," + btoa(svg_xml);
+			var x = parseInt(foreignobject.getAttribute('x')) + 20;
+			var y = parseInt(foreignobject.getAttribute('y')) + 35; // 163
 
-			// 	var $generate     = $('#result-generate-image');
-			// 	var $generateList = $generate.find('ul');
-			// 	var tpl = '<li class="span6 banner-like">' +
-			// 				'<div class="thumbnail">' +
-			// 					imgLike.outerHTML +
-			// 					'<div class="caption">' +
-			// 						'<h3>Banner Like</h3>' +
-			// 						'<p>This is banner description</p>'+
-			// 						'<p>'+ downloadLink.outerHTML +'</p>' +
-			// 					'</div>' +
-			// 				'</div>' +
-			// 			'</li>';
-			// 	$generateList
-			// 		.append(tpl)
-			// 		.append(tpl);
+			var svgNS = "http://www.w3.org/2000/svg";
+			for(var i in titles) {
+				var newText = document.createElementNS(svgNS,"text");
+				newText.setAttributeNS(null,"x", x);
+				newText.setAttributeNS(null,"y", y);
+				newText.setAttributeNS(null,"font-family", "Rockwell");
+				newText.setAttributeNS(null,"font-size", 27);
+				newText.setAttributeNS(null,"fill", "white");
 
-			// 	setTimeout(function() {
-			// 		$.unblockUI({
-			// 			onUnblock: function() {
-			// 				$.blockUI({
-			// 					border: '1px solid #006DCC',
-			// 					message: $generate,
-			// 					css: {
-			// 						cursor: 'default',
-			// 						top    : ($(window).height() - $generate.height()) / 2 + 'px',
-			// 						left   : ($(window).width() - $generate.width()) / 2 + 'px',
-			// 						width  : $generate.width() + 'px',
-			// 						height : $generate.height() + 'px'
-			// 					}
-			// 				});
-			// 				$('.blockOverlay').attr('title', 'Click to cancel').click($.unblockUI);
-			// 			}
-			// 		});
-			// 	}, 300);
-			// };
-			// imgLike.src = "data:image/svg+xml;base64," + btoa(svg_xml);
+				var textNode = document.createTextNode(titles[i]);
+				newText.appendChild(textNode);
+				description.appendChild(newText);
+
+				y += 32;
+			}
+
+			var draw = SVG('canvas');
+			var flow = draw.textflow(p).size(364);
+			flow.font({ family: 'Arial', size: 12 });
+			flow.fill('white');
+			flow.attr('x', x);
+			flow.attr('y', 245);
+
+			var canvas = $('#canvas svg')[0];
+			console.log(canvas);
+			description.appendChild(canvas);
+
+			$(foreignobject).remove();
 		};
 	});

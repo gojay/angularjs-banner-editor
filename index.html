@@ -34,6 +34,10 @@
 	<script type="text/javascript" src="libs/bootstrap.min.js"></script>
 	<script type="text/javascript" src="libs/angular.min.js"></script>
 	<script type="text/javascript" src="libs/SVG.toDataURL/svg_todataurl.js"></script>
+	<!-- http://documentup.com/wout/svg.js -->
+	<script src="libs/svg.js"></script> 
+	<!-- https://github.com/wout/svg.textflow.js -->
+	<script src="libs/svg.textflow.min.js"></script> 
 
 	<!--<script src='http://keith-wood.name/js/jquery.svg.js'></script>
 	<script src="http://keith-wood.name/js/jquery.svgdom.js"></script>
@@ -49,16 +53,6 @@
 	<script type="text/javascript" src="app/controller.js"></script>
 	<script type="text/javascript" src="app/directive.js"></script>
 	<script type="text/javascript" src="app/filter.js"></script>
-	<script>
-		$.fn.textWidth = function(){
-		  	var html_org = $(this).text();
-		  	var html_calc = '<span>' + html_org + '</span>';
-		  	$(this).text(html_calc);
-		  	var width = $(this).find('span:first').width();
-		  	$(this).text(html_org);
-		  	return width;
-		};
-	</script>
 </head>
 <body ng-app="BannerApp">
 	<div class="container">
