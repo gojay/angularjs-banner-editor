@@ -106,7 +106,7 @@ angular.module('BannerControllers', [])
 				price : {
 					width:340,
 					height:183
-				}	
+				}
 			},
 			'tpl-2' : {
 				background : {
@@ -400,7 +400,7 @@ angular.module('BannerControllers', [])
 										$tempImg.remove();
 										$('#crop-wrapper').remove();
 										// change the button text to 'Edit'
-										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+										labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
 										// crop
 										if(act == 'crop'){
 											// change image src, dimension n position
@@ -587,7 +587,7 @@ angular.module('BannerControllers', [])
 									// crop
 									if(act == 'crop'){
 										// change the button text to 'Edit'
-										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+										labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
 										// change image src, dimension n position
 										for(var i in changeEl){
 											changeEl[i].setAttribute('xlink:href',image.src);
@@ -600,7 +600,7 @@ angular.module('BannerControllers', [])
 									// ascpect ratio
 									else if(act == 'ratio'){
 										// change the button text to 'Edit'
-										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+										labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
 										// change image src only
 										for(var j in changeEl){
 											changeEl[j].setAttribute('xlink:href',image.src);
@@ -775,6 +775,9 @@ angular.module('BannerControllers', [])
 		$scope.convert = function(evt){
 			$.blockUI({
 				message: $('#loading-problem'),
+				overlayCSS:{
+					opacity : '0.8'
+				},
 				css: {
 					background : 'transparent',
 					border     : 'none',
@@ -813,7 +816,8 @@ angular.module('BannerControllers', [])
 					imgLike.className  = 'span12';
 					imgEnter.className = 'span12';
 					// define generate element
-					var $generate = $('#result-generate-image');
+					var $generate = $('#result-generate-image-modal');
+					var $generateBody = $generate.find('.modal-body');
 					// create template banner list
 					var tplImages = '<li class="span6 banner-like">' +
 										'<div class="thumbnail">' + imgLike.outerHTML +
@@ -834,11 +838,16 @@ angular.module('BannerControllers', [])
 										'</div>' +
 									'</li>';
 					// append banner images
-					$generate.find('ul').html('');
-					$generate.find('ul').append(tplImages);
+					$generateBody.find('ul').html('');
+					$generateBody.find('ul').append(tplImages);
 					// open popup
 					setTimeout(function() {
 						$.unblockUI({
+							onUnblock: function() {
+								$generate.modal('show');
+							}
+						});
+						/*$.unblockUI({
 							onUnblock: function() {
 								$.blockUI({
 									overlayCSS:{
@@ -856,7 +865,7 @@ angular.module('BannerControllers', [])
 								});
 								$('.blockOverlay').attr('title', 'Click to cancel').click($.unblockUI);
 							}
-						});
+						});*/
 					}, 1000);
 				});
 			});

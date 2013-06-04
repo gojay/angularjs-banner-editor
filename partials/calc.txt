@@ -1,0 +1,128 @@
+background
+	image(fb) x = 0
+logo
+	rect  x = 810 - (x + width) => 490
+	image x = 810 - (x + width) => 500
+description
+	rect 			x = 810 - (x + width) 	=> 430
+	foreignobject 	x = rect.x 				=> 430
+price 2
+	rect x = description.rect.x 						=> 430
+	text x = rect.x + ((rect.width - width) / 2) 		=> 511
+	text > tspan x = x - text.old.x + text.new.x [23/48] 	=> 534/559
+
+	svg	x = rect.x										=> 430
+	rect(border) x = svg.x + 2							=> 432
+	rect(textholder) x = rect(border).x + 3				=> 435
+	foreignobject(text) x = rect(textholder).x			=> 435
+
+	svg	x = (svg.x + svg.width) + (x - (svg.old.x + svg.width))	=> 605
+	rect(border) x = svg.x + 2									=> 607
+	rect(textholder) x = rect(border).x + 3						=> 610
+	foreignobject(text) x = rect(textholder).x					=> 610
+
+xPrizes : [
+	logo : {
+		rect : 440,
+		image : 450
+	},
+	background : {
+		image : 0
+	},
+	description : {
+		rect : 359,
+		foreignobject : 359
+	},
+	price: {
+		rect : 359,
+		text : 371,
+		tspan : {
+			like : 399,
+			enter : 422,
+		},
+		image : [
+			{
+				svg : 570,
+				rect : 572,
+				rect : 359,
+				foreignobject : 359
+			}
+		]		
+	}
+],
+[
+	logo : {
+		rect : 490,
+		image : 500
+	},
+	background : {
+		image : 0
+	},
+	description : {
+		rect : 430,
+		foreignobject : 430
+	},
+	price: {
+		rect : 430,
+		text : 511,
+		tspan : {
+			like : 534,
+			enter : 559,
+		},
+		image : [
+			{
+				svg : 430,
+				rect : 432,
+				rect : 435,
+				foreignobject : 435
+			},
+			{
+				svg : 605,
+				rect : 607,
+				rect : 610,
+				foreignobject : 610
+			}
+		]	
+	}
+],
+[
+	logo : {
+		rect : 490,
+		image : 500
+	},
+	background : {
+		image : 0
+	},
+	description : {
+		rect : 430,
+		foreignobject : 430
+	},
+	price: {
+		rect : 430,
+		text : 511,
+		tspan : {
+			like : 534,
+			enter : 559,
+		},
+		image : [
+			{
+				svg : 430,
+				rect : 432,
+				rect : 435,
+				foreignobject : 435
+			},
+			{
+				svg : 605,
+				rect : 607,
+				rect : 610,
+				foreignobject : 610
+			},
+			{
+				svg : 605,
+				rect : 607,
+				rect : 610,
+				foreignobject : 610
+			}
+		]	
+	}
+]

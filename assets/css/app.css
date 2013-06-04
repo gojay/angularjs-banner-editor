@@ -33,6 +33,11 @@ a:hover {
 	text-align: right
 }
 
+.modal-large{
+   width:1170px;
+   margin-left:-585px;
+}
+
 .container > hr {
 	margin: 40px 0;
 }
