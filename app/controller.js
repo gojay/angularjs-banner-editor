@@ -95,17 +95,17 @@ angular.module('BannerControllers', [])
 					width:810,
 					height:381
 				},
-				logo : {
+				price : {
 					width:340,
 					height:183
-				}				
+				}	
 			},
 			'tpl-2' : {
 				background : {
 					width:810,
 					height:339
 				},
-				logo : {
+				price : {
 					width:203,
 					height:130
 				}
@@ -115,7 +115,7 @@ angular.module('BannerControllers', [])
 					width:770,
 					height:315
 				},
-				logo : {
+				price : {
 					width:250,
 					height:250
 				}
@@ -125,7 +125,7 @@ angular.module('BannerControllers', [])
 					width:810,
 					height:339
 				},
-				logo : {
+				price : {
 					width:208,
 					height:109
 				}
@@ -135,7 +135,7 @@ angular.module('BannerControllers', [])
 					width:810,
 					height:339
 				},
-				logo : {
+				price : {
 					width:170,
 					height:68
 				}
@@ -145,7 +145,7 @@ angular.module('BannerControllers', [])
 					width:810,
 					height:339
 				},
-				logo : {
+				price : {
 					width:137,
 					height:68
 				}
@@ -262,7 +262,7 @@ angular.module('BannerControllers', [])
 			// canvas dimensions
 			var canvasDimensions    = dimensions[tplDimension];
 			var backgroundDimension = canvasDimensions['background'];
-			var logoDimension       = canvasDimensions['logo'];
+			var priceDimension      = canvasDimensions['price'];
 			// compile SVG (inject scope)
 			var tplIndex = tplDimension.match(/(\d)/)[0] - 1;
 			var $svg = getSVGCompiled($tplContent, 'like', tplIndex);
@@ -300,7 +300,7 @@ angular.module('BannerControllers', [])
 						inputFileEl   : '#input-background',
 						inputFileText : 'Select an image',
 						section       : 'background',
-						compile       : function(buttonEl, changeEl, image){
+						compile       : function(buttonEl, changeEl, blob, image){
 							console.log('changeEl', changeEl);
 
 							var labelEl = $(buttonEl).parent().siblings('label')[0];
@@ -359,7 +359,7 @@ angular.module('BannerControllers', [])
 											// set cropSelection
 											cropSelection = selection;
 											var $handle = $('.imgareaselect-handle').parent();
-											$handle.parent().append($compile('<div id="crop-wrapper"><button class="btn btn-primary" ng-click="cropHandle(\'do\')"><i class="icon-crop"></i> Crop</button><button class="btn btn-primary" ng-click="cropHandle(\'fit\')"><i class="icon-resize-horizontal"></i> Auto Fit</button><button class="btn" ng-click="cropHandle(\'cancel\')">Cancel</button></div>')($scope));
+											$handle.parent().append($compile('<div id="crop-wrapper"><button class="btn" ng-click="cropHandle(\'crop\')"><i class="icon-crop"></i> Crop</button><button class="btn btn-primary" ng-click="cropHandle(\'ratio\')"><i class="icon-resize-full"></i> Aspect Ratio</button><button class="btn btn-success" ng-click="cropHandle(\'fit\')"><i class="icon-fullscreen"></i> Auto Fit</button><button class="btn btn-danger" ng-click="cropHandle(\'cancel\')">Cancel</button></div>')($scope));
 										},
 										onSelectStart : function(){
 											console.log('imgAreaSelect start');
@@ -383,9 +383,10 @@ angular.module('BannerControllers', [])
 									onUnblock: function() {
 										$tempImg.remove();
 										$('#crop-wrapper').remove();
-										if(act == 'do'){
-											// change the button text to 'Edit'
-											labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
+										// change the button text to 'Edit'
+										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+										// crop
+										if(act == 'crop'){
 											// change image src, dimension n position
 											for(var i in changeEl){
 												changeEl[i].setAttribute('xlink:href',image.src);
@@ -397,19 +398,37 @@ angular.module('BannerControllers', [])
 											// background reposition
 											$editorAction.show();
 											$('body').trigger('bgReposition', {
-												svg         : $svg,
-												imageBG     : changeEl,
+												svg            : $svg,
+												imageBG        : changeEl,
 												pricesInBottom : pricesInBottom,
-												dimension   : backgroundDimension
+												dimension      : backgroundDimension
 											});
 										}
-										else if(act == 'fit'){
-											// change the button text to 'Edit'
-											labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+										// aspect ratio
+										else if(act == 'ratio'){
 											// change image src only
 											for(var i in changeEl){
 												changeEl[i].setAttribute('xlink:href',image.src);
 											}
+										}
+										// auto fit
+										else if(act == 'fit'){
+											$editorSVG.block({ 
+												message: '<i class="icon-spinner icon-spin icon-large"></i> Please wait...',
+												css: {
+													border: '1px solid #007dbc'
+												}
+											});
+											imageReader.uploadFile({
+												file: blob,
+												name: 'background',
+												size: backgroundDimension
+											}, function(imgUrl){
+												for(var i in changeEl){
+													changeEl[i].setAttribute('xlink:href',imgUrl);
+												}
+												$editorSVG.unblock();
+											});
 										}
 									}
 								});
@@ -422,7 +441,7 @@ angular.module('BannerControllers', [])
 						inputFileEl   : '#input-logo',
 						inputFileText : 'Select an image',
 						section       : 'logo',
-						compile       : function(buttonEl, changeEl, image){
+						compile       : function(buttonEl, changeEl, blob, image){
 							// change text button input file
 							buttonEl.innerHTML = buttonEl.innerHTML.replace(/upload/i, 'Edit');
 							// re-compile to injecting scope
@@ -467,7 +486,7 @@ angular.module('BannerControllers', [])
 					});
 
 					// callback price compile
-					var priceCompile = function(buttonEl, changeEl, image){
+					var priceCompile = function(buttonEl, changeEl, blob, image){
 						var labelEl = $(buttonEl).parent().siblings('label')[0];
 						// auto strecth, if image dimension less than background dimension
 						if(image.width <= backgroundDimension.width && image.height <= backgroundDimension.height)
@@ -488,13 +507,13 @@ angular.module('BannerControllers', [])
 						document.querySelector('body').appendChild(image);
 						var $tempImg = $(image);
 						// calculating crop center
-						var x1 = parseInt((image.width - logoDimension.width) / 2);
-						var y1 = parseInt((image.height - logoDimension.height) / 2);
+						var x1 = parseInt((image.width - priceDimension.width) / 2);
+						var y1 = parseInt((image.height - priceDimension.height) / 2);
 						var pos = {
 							x1 : x1,
 							y1 : y1,
-							x2 : parseInt(x1 + logoDimension.width),
-							y2 : parseInt(y1 + logoDimension.height)
+							x2 : parseInt(x1 + priceDimension.width),
+							y2 : parseInt(y1 + priceDimension.height)
 						};
 						// show crop popup
 						$.blockUI({
@@ -523,7 +542,7 @@ angular.module('BannerControllers', [])
 										// set cropSelection
 										cropSelection = selection;
 										var $handle = $('.imgareaselect-handle').parent();
-										$handle.parent().append($compile('<div id="crop-wrapper"><button class="btn btn-primary" ng-click="cropHandle(\'do\')"><i class="icon-crop"></i> Crop</button><button class="btn btn-primary" ng-click="cropHandle(\'fit\')"><i class="icon-resize-horizontal"></i> Auto Fit</button><button class="btn" ng-click="cropHandle(\'cancel\')">Cancel</button></div>')($scope));
+										$handle.parent().append($compile('<div id="crop-wrapper"><button class="btn" ng-click="cropHandle(\'crop\')"><i class="icon-crop"></i> Crop</button><button class="btn btn-primary" ng-click="cropHandle(\'ratio\')"><i class="icon-resize-full"></i> Aspect Ratio</button><button class="btn btn-success" ng-click="cropHandle(\'fit\')"><i class="icon-fullscreen"></i> Auto Fit</button><button class="btn btn-danger" ng-click="cropHandle(\'cancel\')">Cancel</button></div>')($scope));
 									},
 									onSelectStart : function(){
 										console.log('imgAreaSelect start');
@@ -546,7 +565,8 @@ angular.module('BannerControllers', [])
 								onUnblock: function() {
 									$tempImg.remove();
 									$('#crop-wrapper').remove();
-									if(act == 'do'){
+									// crop
+									if(act == 'crop'){
 										// change the button text to 'Edit'
 										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
 										// change image src, dimension n position
@@ -558,13 +578,33 @@ angular.module('BannerControllers', [])
 											changeEl[i].setAttribute('y', -Math.abs(cropSelection.y1));
 										}
 									}
-									else if(act == 'fit'){
+									// ascpect ratio
+									else if(act == 'ratio'){
 										// change the button text to 'Edit'
 										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
 										// change image src only
 										for(var j in changeEl){
 											changeEl[j].setAttribute('xlink:href',image.src);
 										}
+									}
+									// auto fit
+									else if(act == 'fit'){
+										$editorSVG.block({
+											message: '<i class="icon-spinner icon-spin icon-large"></i> Please wait...',
+											css: {
+												border: '1px solid #007dbc'
+											}
+										});
+										imageReader.uploadFile({
+											file: blob,
+											name: 'prize',
+											size: priceDimension
+										}, function(imgUrl){
+											for(var j in changeEl){
+												changeEl[j].setAttribute('xlink:href',imgUrl);
+											}
+											$editorSVG.unblock();
+										});
 									}
 								}
 							});
@@ -927,8 +967,10 @@ angular.module('BannerControllers', [])
 			for (var i = 0; i < byteString.length; i++) {
 				array.push(byteString.charCodeAt(i));
 			}
+
+			var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
 			return new Blob([new Uint8Array(array)], {
-				type: 'image/svg+xml'
+				type: mimeString
 			});
 		}
 	});

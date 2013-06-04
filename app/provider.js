@@ -154,24 +154,80 @@ angular.module('BannerProvider', [])
 				},
 
 				handleReadImage: function(file, config){
-					if (!file.type.match('image.*')) return;
+					var self = this;
+
+					// validation file image selected
+					if (!(file.type && file.type.match('image.*'))) {
+						// file type is not allowed 
+						alert('Only JPG, PNG or GIF files are allowed');
+						throw new Error('Only JPG, PNG or GIF files are allowed');
+					}
+					// max 10 mB
+					else if (!(file.size && file.size < 10485760)) {
+						// file size > 1MB
+						alert('File is too big!!');
+						throw new Error('File is too big!!');
+					}
+
+					console.log('file', file);
 
 					var buttonEl = config.buttonEl;
 					var changeEl = config.changeEl;
-					var fr     = new FileReader();
-					fr.onload = function(e) {
-						console.log('onload target', e.target);
-
-						var image = new Image();
-						image.onload = function(){
-							console.log(image.width, image.height);
-							if( config.compile ) config.compile(buttonEl, changeEl, image);
-						};
-						image.src = e.target.result;
-					};
+					var fr    = new FileReader();
+					fr.onload = (function(file){
+						return function(e){
+							console.log('onload target', file);
+							var image = new Image();
+							image.onload = function(){
+								console.log(image.width, image.height);
+								if( config.compile ) config.compile(buttonEl, changeEl, file, image);
+							};
+							image.src = e.target.result;
+						}
+					})(file);
 
 					// read as data url
 					fr.readAsDataURL(file);
+				},
+
+				uploadFile: function(data, callback) {
+
+					var self = this;
+
+					// object XMLHttpRequest
+					var xhr = new XMLHttpRequest();
+
+					// xhr response
+					xhr.onload = function() {
+
+						console.log('XHR load', this);
+
+						// OK
+						if (this.status == 200) {
+							// parse JSON response
+							var response = JSON.parse(this.response);
+
+							console.log('response', response);
+
+							if( callback ) callback( response.url );
+
+						}
+						else
+							alert('Error! An error occurred processing image');
+					};
+
+					// xhr open
+					xhr.open('POST', 'upload.php', true);
+
+					// buat form data
+					var formData = new FormData();
+					formData.append('file', data.file);
+					formData.append('width', data.size.width);
+					formData.append('height', data.size.height);
+					formData.append('name', data.name);
+
+					// xhr send request
+					xhr.send(formData);
 				}
 			};
 		};
