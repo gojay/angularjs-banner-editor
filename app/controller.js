@@ -304,7 +304,7 @@ angular.module('BannerControllers', [])
 							console.log('changeEl', changeEl);
 
 							var labelEl = $(buttonEl).parent().siblings('label')[0];
-							if(image.width <= backgroundDimension.width && image.height <= backgroundDimension.height){
+							if((image.width <= backgroundDimension.width && image.height <= backgroundDimension.height) ){
 								// change the button text to 'Edit'
 								labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
 								// re-compile to injecting scope
@@ -359,7 +359,7 @@ angular.module('BannerControllers', [])
 											// set cropSelection
 											cropSelection = selection;
 											var $handle = $('.imgareaselect-handle').parent();
-											$handle.parent().append($compile('<div id="crop-wrapper"><button class="btn btn-primary" ng-click="cropHandle(\'do\')"><i class="icon-crop"></i> Crop</button><button class="btn" ng-click="cropHandle(\'cancel\')">Cancel</button></div>')($scope));
+											$handle.parent().append($compile('<div id="crop-wrapper"><button class="btn btn-primary" ng-click="cropHandle(\'do\')"><i class="icon-crop"></i> Crop</button><button class="btn btn-primary" ng-click="cropHandle(\'fit\')"><i class="icon-resize-horizontal"></i> Auto Fit</button><button class="btn" ng-click="cropHandle(\'cancel\')">Cancel</button></div>')($scope));
 										},
 										onSelectStart : function(){
 											console.log('imgAreaSelect start');
@@ -402,6 +402,14 @@ angular.module('BannerControllers', [])
 												pricesInBottom : pricesInBottom,
 												dimension   : backgroundDimension
 											});
+										}
+										else if(act == 'fit'){
+											// change the button text to 'Edit'
+											labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
+											// change image src only
+											for(var i in changeEl){
+												changeEl[i].setAttribute('xlink:href',image.src);
+											}
 										}
 									}
 								});
@@ -536,6 +544,8 @@ angular.module('BannerControllers', [])
 							$tempImg.imgAreaSelect({remove:true});
 							$.unblockUI({
 								onUnblock: function() {
+									$tempImg.remove();
+									$('#crop-wrapper').remove();
 									if(act == 'do'){
 										// change the button text to 'Edit'
 										labelEl.innerHTML = labelEl.innerHTML.replace(/add/i, 'Edit');
@@ -556,8 +566,6 @@ angular.module('BannerControllers', [])
 											changeEl[j].setAttribute('xlink:href',image.src);
 										}
 									}
-									$tempImg.remove();
-									$('#crop-wrapper').remove();
 								}
 							});
 						};
@@ -684,6 +692,7 @@ angular.module('BannerControllers', [])
 
 		function createCanvas(svg, canvasDimensions, callback){
 			var svg_xml = (new XMLSerializer()).serializeToString(svg);
+			console.log(svg_xml);
 			var canvas    = document.createElement('canvas');
 			canvas.width  = canvasDimensions.width;
 			canvas.height = canvasDimensions.height;
@@ -793,42 +802,133 @@ angular.module('BannerControllers', [])
 		// http://documentup.com/wout/svg.js
 		// https://github.com/wout/svg.textflow.js
 		$scope.foreignToSVGXML = function(evt){
-			var $svg = $('#svg-editor > svg').eq(0);
-			var description   = $('#description', $svg)[0];
-			var foreignobject = $('#description > .foreign-object', $svg)[0];
-			var titles = $(foreignobject).find('h3').html().split(/<br[^>]*>/gi);
-			var p = $(foreignobject).find('p').html();
+			// var $svg = $('#svg-editor > svg').eq(0);
+			// var description   = $('#description', $svg)[0];
+			// var foreignobject = $('#description > .foreign-object', $svg)[0];
+			// var titles = $(foreignobject).find('h3').html().split(/<br[^>]*>/gi);
+			// var p = $(foreignobject).find('p').html();
 
-			var x = parseInt(foreignobject.getAttribute('x')) + 20;
-			var y = parseInt(foreignobject.getAttribute('y')) + 35; // 163
+			// var x = parseInt(foreignobject.getAttribute('x')) + 20;
+			// var y = parseInt(foreignobject.getAttribute('y')) + 35; // 163
 
-			var svgNS = "http://www.w3.org/2000/svg";
-			for(var i in titles) {
-				var newText = document.createElementNS(svgNS,"text");
-				newText.setAttributeNS(null,"x", x);
-				newText.setAttributeNS(null,"y", y);
-				newText.setAttributeNS(null,"font-family", "Rockwell");
-				newText.setAttributeNS(null,"font-size", 27);
-				newText.setAttributeNS(null,"fill", "white");
+			// var svgNS = "http://www.w3.org/2000/svg";
+			// for(var i in titles) {
+			// 	var newText = document.createElementNS(svgNS,"text");
+			// 	newText.setAttributeNS(null,"x", x);
+			// 	newText.setAttributeNS(null,"y", y);
+			// 	newText.setAttributeNS(null,"font-family", "Rockwell");
+			// 	newText.setAttributeNS(null,"font-size", 27);
+			// 	newText.setAttributeNS(null,"fill", "white");
 
-				var textNode = document.createTextNode(titles[i]);
-				newText.appendChild(textNode);
-				description.appendChild(newText);
+			// 	var textNode = document.createTextNode(titles[i]);
+			// 	newText.appendChild(textNode);
+			// 	description.appendChild(newText);
 
-				y += 32;
-			}
+			// 	y += 32;
+			// }
 
-			var draw = SVG('canvas');
-			var flow = draw.textflow(p).size(364);
-			flow.font({ family: 'Arial', size: 12 });
-			flow.fill('white');
-			flow.attr('x', x);
-			flow.attr('y', 245);
+			// var draw = SVG('canvas');
+			// var flow = draw.textflow(p).size(364);
+			// flow.font({ family: 'Arial', size: 12 });
+			// flow.fill('white');
+			// flow.attr('x', x);
+			// flow.attr('y', 245);
 
-			var canvas = $('#canvas svg')[0];
-			console.log(canvas);
-			description.appendChild(canvas);
+			// var canvas = $('#canvas svg')[0];
+			// console.log(canvas);
+			// description.appendChild(canvas);
 
-			$(foreignobject).remove();
+			// $(foreignobject).remove();
+			
+			// http://updates.html5rocks.com/2011/08/Saving-generated-files-on-the-client-side
+			// http://www.html5rocks.com/en/tutorials/file/filesystem/#toc-file-writing
+			var svg = $('#svg-editor > svg')[0];
+			var svg_xml = (new XMLSerializer()).serializeToString(svg);
+
+			// var bb = new BlobBuilder();
+			// bb.append(svg_xml);
+			// var blob = bb.getBlob("application/svg+xml;charset=" + svg.characterSet);
+			// saveAs(blob, "test.svg");
+			// 
+			// var DOMURL = window.URL || window.webkitURL || window.mozURL;
+			// var img = new Image();
+			// var svg = new Blob([svg_xml], {type: "image/jpeg;charset=utf-8"});
+			// var url = DOMURL.createObjectURL(svg);
+			// console.log(url);
+			// img.onload = function() {
+			//     DOMURL.revokeObjectURL(url);
+			//     $('body').append(img.outerHTML);
+			// };
+			// img.src = url;
+
+			// var canvas    = document.createElement('canvas');
+			// // get canvas context
+			// var ctx = canvas.getContext("2d");
+			// var img = new Image();
+			// img.onload = function(){
+			// 	canvas.width  = img.width;
+			// 	canvas.height = img.height;
+			// 	ctx.drawImage(img, 0, 0);
+
+			// 	$('body').append(canvas.outerHTML);
+
+			var file = dataURItoBlob("data:image/svg+xml;base64," + btoa(svg_xml));
+			console.log(file);
+			var url = window.URL.createObjectURL(file);
+			var img2 = new Image();
+			img2.onload = function(){
+				// Clean up after
+				window.URL.revokeObjectURL(url);
+			};
+			img2.src = url;
+			$('body').append(img2.outerHTML);
+
+			// 	// var fd = new FormData();
+			// 	// fd.append('file', file);
+
+			// 	// var xhr = new XMLHttpRequest();
+			// 	// xhr.open('POST', 'upload.php', true);
+			// 	// xhr.onload= function(e) {
+			// 	// 	console.log('onload', e);
+			// 	// 	// status ok
+			// 	// 	if (this.status == 200) {
+			// 	// 		var response = JSON.parse(this.response);
+			// 	// 		console.log(response);
+
+			// 	// 		var canvas2 = document.createElement('canvas');
+			// 	// 		var ctx2 = canvas2.getContext("2d");
+			// 	// 		var img2 = new Image();
+			// 	// 		img2.onload = function(){
+			// 	// 			canvas2.width  = img2.width;
+			// 	// 			canvas2.height = img2.height;
+			// 	// 			ctx2.drawImage(img2, 0, 0);
+			// 	// 			$('body').append(img2);
+			// 	// 			var du = canvas2.toDataURL('image/png');
+			// 	// 			console.log(du);
+			// 	// 		};
+			// 	// 		img2.src = response.data;
+			// 	// 	}
+			// 	// };
+			// 	// // send
+			// 	// xhr.send(fd);
+
+			// 	// $('body').append(img.outerHTML);
+			// };
+			// img.src = "data:image/svg+xml;base64," + btoa(svg_xml);
 		};
+
+		function dataURItoBlob(dataURI) {
+		    var byteString;
+			if (dataURI.split(',')[0].indexOf('base64') >= 0)
+			    byteString = atob(dataURI.split(',')[1]);
+			else
+			    byteString = unescape(dataURI.split(',')[1]);
+			var array = [];
+			for (var i = 0; i < byteString.length; i++) {
+				array.push(byteString.charCodeAt(i));
+			}
+			return new Blob([new Uint8Array(array)], {
+				type: 'image/svg+xml'
+			});
+		}
 	});
