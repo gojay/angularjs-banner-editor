@@ -41,6 +41,8 @@ angular.module('BannerControllers', [])
 			}
 		};
 
+		$scope.isNoPrize = false;
+
 		// scope watchers
 		$scope.$watch('banner.title.text', function(input){
 			$scope.banner.title.limit = $scope.banner.title.counter - input.length;
@@ -90,6 +92,12 @@ angular.module('BannerControllers', [])
 		});
 
 		var dimensions = {
+			'tpl-0' : {
+				background : {
+					width:810,
+					height:381
+				}
+			},
 			'tpl-1' : {
 				background : {
 					width:810,
@@ -263,6 +271,14 @@ angular.module('BannerControllers', [])
 			var canvasDimensions    = dimensions[tplDimension];
 			var backgroundDimension = canvasDimensions['background'];
 			var priceDimension      = canvasDimensions['price'];
+
+			// empty prize
+			if(priceDimension === undefined) {
+				$scope.isNoPrize = true;
+			} else {
+				$scope.isNoPrize = false;
+			}
+
 			// compile SVG (inject scope)
 			var tplIndex = tplDimension.match(/(\d)/)[0] - 1;
 			var $svg = getSVGCompiled($tplContent, 'like', tplIndex);
@@ -485,6 +501,9 @@ angular.module('BannerControllers', [])
 						}
 					});
 
+					// empty prize
+					if(priceDimension === undefined) return;
+
 					// callback price compile
 					var priceCompile = function(buttonEl, changeEl, blob, image){
 						var labelEl = $(buttonEl).parent().siblings('label')[0];
@@ -697,21 +716,26 @@ angular.module('BannerControllers', [])
 				}
 				else return;
 			});
-			var _index = 1;
-			$('#price', $svg).children().map(function(i,e){
-				if($(e).attr('id') === undefined) return;
-				if(type == 'enter') {
-					var x = [586,542,345,96,168,198];
-					$('#price > text > tspan', $svg).text('Enter to Win!');
-					$('#price > text > tspan', $svg).attr('x', x[tplIndex]);
-				}
-				$(e).attr('id', function(index, id){
-					return id.replace(/(\d+)/, function(fullMatch, n) {
-						return 'editor-'+ type + '-' + _index;
+
+			// has prize
+			if( $('#price', $svg).length )
+			{
+				var _index = 1;
+				$('#price', $svg).children().map(function(i,e){
+					if($(e).attr('id') === undefined) return;
+					if(type == 'enter') {
+						var x = [586,542,345,96,168,198];
+						$('#price > text > tspan', $svg).text('Enter to Win!');
+						$('#price > text > tspan', $svg).attr('x', x[tplIndex]);
+					}
+					$(e).attr('id', function(index, id){
+						return id.replace(/(\d+)/, function(fullMatch, n) {
+							return 'editor-'+ type + '-' + _index;
+						});
 					});
+					_index++;
 				});
-				_index++;
-			});
+			}
 
 			return $compile($svg)($scope);
 		};
