@@ -14,6 +14,9 @@ angular.module('BannerApp', ['BannerProvider', 'BannerControllers', 'BannerCompo
 					templateUrl : 'partials/home.html',
 					controller  : 'BannerEditor'
 				})
+				.when('/page', {
+					template    : '<page-editor></page-editor>'
+				})
 				.otherwise({ redirectTo:'/' });
 		}
 	]);

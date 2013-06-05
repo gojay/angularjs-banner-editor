@@ -13,6 +13,7 @@ $upload_dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'uploads';
 $name   = $_REQUEST['name'];
 $width  = $_REQUEST['width'];
 $height = $_REQUEST['height'];
+$isCrop = isset($_REQUEST['crop']) ? $_REQUEST['crop'] : false ;
 
 $fileImg  = $_FILES['file']['tmp_name'];
 $fileName = $_FILES['file']['name'];
@@ -25,7 +26,10 @@ $imagehand->file_dst_name_ext  = $ext;
 $imagehand->file_new_name_body = $name;
 $imagehand->file_overwrite     = true;
 $imagehand->image_resize       = true;
-// $imagehand->image_ratio_crop   = true;
+if( $isCrop ) {
+	$imagehand->image_ratio_crop = true;
+	$imagehand->image_ratio_fill = true;	
+}
 $imagehand->image_x            = $width;
 $imagehand->image_y            = $height;
 $imagehand->image_convert      = $ext;
@@ -36,6 +40,6 @@ sleep(2);
 
 // create data uri
 echo json_encode(array(
-	'url' => data_uri($imagehand->file_dst_pathname, $fileType)
+	'url' => 'http://dev.angularjs/_learn_/angularjs-banner-editor/uploads/' . $imagehand->file_dst_name
 ));
 ?>

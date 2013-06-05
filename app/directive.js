@@ -104,4 +104,150 @@ angular.module('BannerComponents', [])
 				};
 			}
 		};
+	})
+	.directive('pageEditor', function($compile){
+		// Runs during compile
+		return {
+			restrict: 'EAC', // E = Element, A = Attribute, C = Class, M = Comment
+			templateUrl: 'partials/components/fbPage.html',
+			replace: true,
+			controller: function($scope, $element, $attrs, $transclude) {
+				$scope.disableInputBG = true;
+
+				var self = this;
+
+				this.setSVGImage = function(imgUri){
+					self.imageBGTpl = imgUri;
+					$scope.$apply(function(scope){
+						scope.disableInputBG = false;
+					});
+					// var draw   = SVG('canvas').size(403, 403);
+					// draw.attr('id', 1);
+					// var image  = draw.image('http://dev.angularjs/_learn_/angularjs-banner-editor/uploads/bg_1.jpg', 403, 403);
+					// image.attr('x',0);
+					// image.attr('y',0);
+					// var image2  = draw.image(imgUri, 403, 403);
+					// image2.attr('x',0);
+					// image2.attr('y',0);
+				};
+
+				this.imageValidation = function(file){
+					// validation file image selected
+					if (!(file.type && file.type.match('image.*'))) {
+						// file type is not allowed 
+						alert('Only JPG, PNG or GIF files are allowed');
+						throw new Error('Only JPG, PNG or GIF files are allowed');
+					}
+					// max 10 mB
+					else if (!(file.size && file.size < 10485760)) {
+						// file size > 1MB
+						alert('File is too big!!');
+						throw new Error('File is too big!!');
+					}
+				};
+
+				this.addList = function(svg){
+					var $thumb = $('<div class="thumbnail border-none text-center"></div>').append($(svg).attr('style',''));
+					var $li  = '<li class="span6 wait">'+
+									'<div class="loading"><i class="icon-spinner icon-spin icon-large"></i> loading</div>'+ $thumb.prop('outerHTML')
+							   '</li>';
+					$('#page-templates > ul').append($li);
+				};
+
+				this.handleMultipleFiles = function(evt){
+					var files = evt.target.files;
+					console.log(files);
+
+					if( self.imageBGTpl === undefined ) return;
+
+					for (var i = 0; i < files.length; i++)
+					{
+						// create index
+						var index = i + 1;
+						// get blob file
+						var file  = files[i];
+						// image validation
+						self.imageValidation(file);
+						// resize file
+						self.uploadFile({
+							file  : file,
+							name  : 'bg-' + index,
+							width : 403,
+							height: 403
+						}, function(imgUri){
+							var svg    = SVG('canvas').size(403, 403);
+							var imgBG  = svg.image(imgUri, 403, 403);
+							var imgTpl = svg.image(self.imageBGTpl, 403, 403);
+							svg.attr('id', 'svg-page-' + index);
+							imgTpl.maskWith(imgBG);
+							// prepend bg image
+							console.log($(svg));
+							// add to list
+							self.addList(svg.node);
+						});
+					}
+				};
+				this.uploadFile = function(data, callback){
+					// object XMLHttpRequest
+					var xhr = new XMLHttpRequest();
+
+					// xhr response
+					xhr.onload = function() {
+
+						// OK
+						if (this.status == 200) {
+							// parse JSON response
+							var response = JSON.parse(this.response);
+
+							console.log('response', response);
+
+							if( callback ) callback( response.url );
+
+						}
+						else
+							alert('Error! An error occurred processing image');
+					};
+
+					// xhr open
+					xhr.open('POST', 'upload.php', true);
+
+					console.log(data);
+
+					// buat form data
+					var formData = new FormData();
+					formData.append('file', data.file);
+					formData.append('name', data.name);
+					formData.append('width', data.width);
+					formData.append('height', data.height);
+					formData.append('crop', true);
+
+					// xhr send request
+					xhr.send(formData);
+				};
+			},
+			link: function($scope, iElm, iAttrs, controller) {
+
+				$('#button-main-template').click(function() {
+					$('#input-main-template').click();
+				});
+				$('#button-background-template').click(function() {
+					$('#input-background-template').click();
+				});
+
+				$('#input-main-template').bind('change', function(evt){
+					var file = evt.target.files[0];
+
+					// image validation
+					controller.imageValidation(file);
+
+					var fileReader = new FileReader();
+					fileReader.onload = function(e){
+						controller.setSVGImage(e.target.result);
+					};
+					// read as data uri
+					fileReader.readAsDataURL(file);
+				});
+				$('#input-background-template').bind('change', controller.handleMultipleFiles);
+			}
+		};
 	});

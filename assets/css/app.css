@@ -20,7 +20,7 @@ a:hover {
 }
 
 .border-none {
-	border-radius: 0px;
+	border: none;
 }
 
 .text-left {
@@ -154,4 +154,27 @@ input[type="checkbox"] ~ label {
 }
 #crop-wrapper button {
 	margin: 0 5px;
+}
+
+.thumbnails li {
+	position: relative;
+}
+.thumbnails li:nth-child(odd){
+	margin-left: 0;
+}
+li > .loading {
+	visibility: hidden;
+	position: absolute;
+	top: 45%;
+	left: 45%;
+}
+li.wait img {
+	/*background-color: rgba(0, 0, 0, 0.2);*/
+	opacity: 0.5;
+}
+li.wait .loading {
+	visibility: visible;
+}
+li.wait .thumbnail {
+	opacity: 0.5;
 }
