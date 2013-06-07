@@ -116,21 +116,72 @@ angular.module('BannerComponents', [])
 
 				var self = this;
 
-				this.setSVGImage = function(imgUri){
-					self.imageBGTpl = imgUri;
-					$scope.$apply(function(scope){
-						scope.disableInputBG = false;
-					});
-					// var draw   = SVG('canvas').size(403, 403);
-					// draw.attr('id', 1);
-					// var image  = draw.image('http://dev.angularjs/_learn_/angularjs-banner-editor/uploads/bg_1.jpg', 403, 403);
-					// image.attr('x',0);
-					// image.attr('y',0);
-					// var image2  = draw.image(imgUri, 403, 403);
-					// image2.attr('x',0);
-					// image2.attr('y',0);
+				// handle single file (template image)
+				this.handleTplFile = function(evt){
+					var file = evt.target.files[0];
+					// validation file image selected
+					self.imageValidation(file);
+					// file reader
+					var fileReader = new FileReader();
+					fileReader.onload = function(e){
+						self.imageTpl = e.target.result;
+						$scope.$apply(function(scope){
+							scope.disableInputBG = false;
+						});
+					};
+					// read as data uri
+					fileReader.readAsDataURL(file);
 				};
-
+				// handle multiple files (background images)
+				this.handleMultipleFiles = function(evt){
+					var files      = evt.target.files;
+					var countFiles = files.length;
+					var requests   = [];
+					// check image tpl is exists
+					if( self.imageTpl === undefined ) return;
+					// looping files
+					angular.forEach(files, function(file,i){
+						// create index
+						var index = i + 1;
+						// validation file image selected
+						self.imageValidation(file);
+						// file reader
+						var fileReader = new FileReader();
+						fileReader.onload = (function(blob){
+							return function(e){
+								var svg    = SVG('canvas').size(403, 403);
+								var imgBG  = svg.image(e.target.result, 395, 395);
+								var imgTpl = svg.image(self.imageTpl, 403, 403);
+								// add svg id
+								svg.attr('id', 'svg-page-' + index);
+								imgBG.attr({
+									x:5,
+									y:5,
+									class: 'background'
+								});
+								// imgTpl.maskWith(imgBG);
+								requests.push({blob:blob, index:index});
+								// add to list
+								var callback = null;
+								// do uploads, if is the last
+								if(requests.length == countFiles) {
+									callback = function(){
+										console.info('start chainedMultipleUpload');
+										self.chainedMultipleUpload(requests).done(function(response){
+											console.log(response);
+										});
+									};
+								}
+								// add to list
+								self.addImgList({id:'img-page-'+index, imguri:e.target.result}, callback);
+								self.addSVGList(svg.node, callback);
+							};
+						})(file);
+						// read as data uri
+						fileReader.readAsDataURL(file);
+					});
+				};
+				// image validation
 				this.imageValidation = function(file){
 					// validation file image selected
 					if (!(file.type && file.type.match('image.*'))) {
@@ -145,108 +196,107 @@ angular.module('BannerComponents', [])
 						throw new Error('File is too big!!');
 					}
 				};
-
-				this.addList = function(svg){
+				// add to list
+				this.addImgList = function(data){
+					var $li  = '<li class="span3 wait">'+
+									'<div class="wait"><i class="icon-spinner icon-spin icon-large"></i> Waiting...</div>'+
+									'<div class="loading"><i class="icon-spinner icon-spin icon-large"></i> Processing..</div>'+
+									'<img id="'+ data.id +'" src="'+ data.imguri +'" />'+
+								'</li>';
+					$('#page-templates ul.img-list').append($li);
+				};
+				this.addSVGList = function(svg, callback){
 					var $thumb = $('<div class="thumbnail border-none text-center"></div>').append($(svg).attr('style',''));
-					var $li  = '<li class="span6 wait">'+
-									'<div class="loading"><i class="icon-spinner icon-spin icon-large"></i> loading</div>'+ $thumb.prop('outerHTML')
-							   '</li>';
-					$('#page-templates > ul').append($li);
+					var $li  = '<li class="span6 wait">' +
+									'<div class="wait"><i class="icon-spinner icon-spin icon-large"></i> Waiting...</div>' +
+									'<div class="loading"><i class="icon-spinner icon-spin icon-large"></i> Processing..</div>' +
+									$thumb.prop('outerHTML') +
+								'</li>';
+					$('#page-templates ul.svg-list').append($li);
+					if(callback) callback();
 				};
 
-				this.handleMultipleFiles = function(evt){
-					var files = evt.target.files;
-					console.log(files);
-
-					if( self.imageBGTpl === undefined ) return;
-
-					for (var i = 0; i < files.length; i++)
-					{
-						// create index
-						var index = i + 1;
-						// get blob file
-						var file  = files[i];
-						// image validation
-						self.imageValidation(file);
-						// resize file
-						self.uploadFile({
-							file  : file,
-							name  : 'bg-' + index,
-							width : 403,
-							height: 403
-						}, function(imgUri){
-							var svg    = SVG('canvas').size(403, 403);
-							var imgBG  = svg.image(imgUri, 403, 403);
-							var imgTpl = svg.image(self.imageBGTpl, 403, 403);
-							svg.attr('id', 'svg-page-' + index);
-							imgTpl.maskWith(imgBG);
-							// prepend bg image
-							console.log($(svg));
-							// add to list
-							self.addList(svg.node);
+				// monitoring multiple uploads
+				this.chainedMultipleUpload = function(requests){
+					var deferred = $.Deferred();
+					// get count requests
+					var countRequest = requests.length;
+					// do upload
+					var promises = requests.reduce(function(promise, request, _index){
+						// get index
+						var index = request.index;
+						return promise.pipe(function(){
+							// get elements
+							var $imgIndex = $('#img-page-' + index);
+							var $svgIndex = $('#svg-page-' + index);
+							// get list element
+							var $liImg = $imgIndex.parents('li');
+							var $liSVG = $svgIndex.parents('li');
+							// change loading class
+							$liImg.removeClass('wait').addClass('loading');
+							$liSVG.removeClass('wait').addClass('loading');
+							// upload to resize
+							return self.uploadFile({
+								file  : request.blob,
+								name  : 'bg-' + request.index,
+								index : request.index,
+								width : 395,
+								height: 395,
+								crop  : true
+							}).pipe(function(response){
+								console.log('response', index, response);
+								// change image
+								$svgIndex.find('image.background')[0].setAttribute('xlink:href',response.url);
+								// remove loading
+								$liImg.removeClass('loading');
+								$liSVG.removeClass('loading');
+								// send completed
+								if(index >= countRequest) return 'Completed';
+							});
 						});
-					}
+					}, deferred.promise());
+
+					// start chain
+					deferred.resolve();
+
+					// return final promise
+					return promises;
 				};
-				this.uploadFile = function(data, callback){
-					// object XMLHttpRequest
-					var xhr = new XMLHttpRequest();
-
-					// xhr response
-					xhr.onload = function() {
-
-						// OK
-						if (this.status == 200) {
-							// parse JSON response
-							var response = JSON.parse(this.response);
-
-							console.log('response', response);
-
-							if( callback ) callback( response.url );
-
-						}
-						else
-							alert('Error! An error occurred processing image');
-					};
-
-					// xhr open
-					xhr.open('POST', 'upload.php', true);
-
+				// upload to resize file
+				this.uploadFile = function(data){
 					console.log(data);
-
-					// buat form data
+					// create form data
 					var formData = new FormData();
 					formData.append('file', data.file);
 					formData.append('name', data.name);
 					formData.append('width', data.width);
 					formData.append('height', data.height);
 					formData.append('crop', true);
-
-					// xhr send request
-					xhr.send(formData);
+					// ajax upload
+					return $.ajax({
+						/*
+						 * processData and contentType must be false to prevent jQuery
+						 * setting its own defaults ... which would result in nonsense
+						 */
+						processData	: false,
+						contentType	: false,
+						type		: 'POST',
+						url			: 'upload.php',
+						data		: formData,
+						dataType	: 'json'
+					});
 				};
 			},
 			link: function($scope, iElm, iAttrs, controller) {
-
+				// event listener button input file
 				$('#button-main-template').click(function() {
 					$('#input-main-template').click();
 				});
 				$('#button-background-template').click(function() {
 					$('#input-background-template').click();
 				});
-
-				$('#input-main-template').bind('change', function(evt){
-					var file = evt.target.files[0];
-
-					// image validation
-					controller.imageValidation(file);
-
-					var fileReader = new FileReader();
-					fileReader.onload = function(e){
-						controller.setSVGImage(e.target.result);
-					};
-					// read as data uri
-					fileReader.readAsDataURL(file);
-				});
+				// event listener input file
+				$('#input-main-template').bind('change', controller.handleTplFile);
 				$('#input-background-template').bind('change', controller.handleMultipleFiles);
 			}
 		};

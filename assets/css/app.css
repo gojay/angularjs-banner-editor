@@ -156,25 +156,44 @@ input[type="checkbox"] ~ label {
 	margin: 0 5px;
 }
 
-.thumbnails li {
+/* page */
+
+ul.thumbnails li {
 	position: relative;
 }
-.thumbnails li:nth-child(odd){
+ul.img-list li:nth-child(4n+1),
+ul.svg-list li:nth-child(odd){
 	margin-left: 0;
 }
+
+ul.img-list li img {
+	height: 250px;
+}
+
+li > .wait,
 li > .loading {
 	visibility: hidden;
 	position: absolute;
+}
+ul.img-list li > .wait,
+ul.img-list li > .loading {
+	top: 45%;
+	left: 85px;
+}
+ul.svg-list li > .wait,
+ul.svg-list li > .loading {
 	top: 45%;
 	left: 45%;
 }
-li.wait img {
-	/*background-color: rgba(0, 0, 0, 0.2);*/
-	opacity: 0.5;
-}
-li.wait .loading {
+li.wait .wait,
+li.loading .loading {
 	visibility: visible;
 }
+li.wait img,
 li.wait .thumbnail {
-	opacity: 0.5;
+	opacity: 0.05;
+}
+li.loading img,
+li.loading .thumbnail {
+	opacity: 0.25;
 }

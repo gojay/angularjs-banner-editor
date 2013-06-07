@@ -36,7 +36,7 @@ $imagehand->image_convert      = $ext;
 $imagehand->Process($upload_dir);
 if( !$imagehand->processed ) throw new Exception("Error upload $fileName");
 
-sleep(2);
+sleep(3);
 
 // create data uri
 echo json_encode(array(
