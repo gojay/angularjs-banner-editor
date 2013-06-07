@@ -112,9 +112,14 @@ angular.module('BannerComponents', [])
 			templateUrl: 'partials/components/fbPage.html',
 			replace: true,
 			controller: function($scope, $element, $attrs, $transclude) {
-				$scope.disableInputBG = true;
+				$scope.disableInputBG     = true;
+				$scope.isGenerateDisabled = true;
 
-				var self = this;
+				$scope.finishedImages = 0;
+				$scope.countImages    = 0;
+
+				var self  = this;
+				var index = 1;
 
 				// handle single file (template image)
 				this.handleTplFile = function(evt){
@@ -137,12 +142,13 @@ angular.module('BannerComponents', [])
 					var files      = evt.target.files;
 					var countFiles = files.length;
 					var requests   = [];
+					var sizes      = 0;
 					// check image tpl is exists
 					if( self.imageTpl === undefined ) return;
+					// preparing page
+					$('#page-templates').addClass('prepare');
 					// looping files
 					angular.forEach(files, function(file,i){
-						// create index
-						var index = i + 1;
 						// validation file image selected
 						self.imageValidation(file);
 						// file reader
@@ -160,21 +166,40 @@ angular.module('BannerComponents', [])
 									class: 'background'
 								});
 								// imgTpl.maskWith(imgBG);
-								requests.push({blob:blob, index:index});
+								sizes += blob.size;
+								requests.push({
+									blob:blob,
+									size:sizes,
+									index:index
+								});
 								// add to list
 								var callback = null;
 								// do uploads, if is the last
 								if(requests.length == countFiles) {
 									callback = function(){
-										console.info('start chainedMultipleUpload');
-										self.chainedMultipleUpload(requests).done(function(response){
-											console.log(response);
-										});
+										console.info('start chainedMultipleUpload...');
+										setTimeout(function() {
+											$('#page-templates').removeClass('prepare').addClass('ready');
+											$scope.$apply(function(scope){
+												scope.countImages = countFiles;
+											});
+											self.chainedMultipleUpload(requests, sizes).done(function(response){
+												console.log(response);
+												// update progress bar completed
+												$('.progress').removeClass('progress-striped active').addClass('progress-success');
+												// applying isGenerateDisabled to false
+												$scope.$apply(function(scope){
+													scope.isGenerateDisabled = false;
+												});
+											});
+										}, 3000);
 									};
 								}
 								// add to list
 								self.addImgList({id:'img-page-'+index, imguri:e.target.result}, callback);
 								self.addSVGList(svg.node, callback);
+								// increase index
+								index++;
 							};
 						})(file);
 						// read as data uri
@@ -200,7 +225,7 @@ angular.module('BannerComponents', [])
 				this.addImgList = function(data){
 					var $li  = '<li class="span3 wait">'+
 									'<div class="wait"><i class="icon-spinner icon-spin icon-large"></i> Waiting...</div>'+
-									'<div class="loading"><i class="icon-spinner icon-spin icon-large"></i> Processing..</div>'+
+									'<div class="loading"><i class="icon-spinner icon-spin icon-4x"></i> <span>Processing..</span></div>'+
 									'<img id="'+ data.id +'" src="'+ data.imguri +'" />'+
 								'</li>';
 					$('#page-templates ul.img-list').append($li);
@@ -209,7 +234,7 @@ angular.module('BannerComponents', [])
 					var $thumb = $('<div class="thumbnail border-none text-center"></div>').append($(svg).attr('style',''));
 					var $li  = '<li class="span6 wait">' +
 									'<div class="wait"><i class="icon-spinner icon-spin icon-large"></i> Waiting...</div>' +
-									'<div class="loading"><i class="icon-spinner icon-spin icon-large"></i> Processing..</div>' +
+									'<div class="loading"><i class="icon-spinner icon-spin icon-4x"></i> <span>Processing..</span></div>' +
 									$thumb.prop('outerHTML') +
 								'</li>';
 					$('#page-templates ul.svg-list').append($li);
@@ -217,7 +242,7 @@ angular.module('BannerComponents', [])
 				};
 
 				// monitoring multiple uploads
-				this.chainedMultipleUpload = function(requests){
+				this.chainedMultipleUpload = function(requests, sizes){
 					var deferred = $.Deferred();
 					// get count requests
 					var countRequest = requests.length;
@@ -249,7 +274,16 @@ angular.module('BannerComponents', [])
 								$svgIndex.find('image.background')[0].setAttribute('xlink:href',response.url);
 								// remove loading
 								$liImg.removeClass('loading');
+								// $liImg.addClass('success');
 								$liSVG.removeClass('loading');
+								// create percentage
+								var percent = Math.round((request.size / sizes) * 100);
+								// update progress bar
+								$('.progress > .bar').css('width', percent + '%');
+								// applying finished images
+								$scope.$apply(function(scope){
+									scope.finishedImages = index;
+								});
 								// send completed
 								if(index >= countRequest) return 'Completed';
 							});
@@ -274,10 +308,7 @@ angular.module('BannerComponents', [])
 					formData.append('crop', true);
 					// ajax upload
 					return $.ajax({
-						/*
-						 * processData and contentType must be false to prevent jQuery
-						 * setting its own defaults ... which would result in nonsense
-						 */
+						// processData and contentType must be false to prevent jQuery
 						processData	: false,
 						contentType	: false,
 						type		: 'POST',

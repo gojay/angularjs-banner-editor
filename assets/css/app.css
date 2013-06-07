@@ -158,6 +158,29 @@ input[type="checkbox"] ~ label {
 
 /* page */
 
+#page-templates {
+	position: relative;
+}
+#page-templates > .loading,
+#page-templates > .editor{
+	display: none;
+}
+#page-templates.prepare > .loading,
+#page-templates.ready > .editor{
+	display: block;
+}
+#page-templates > .loading{
+	position: absolute;
+	top: 45%;
+	left: 45%;
+}
+
+.loading > span {
+	display: block;
+	position: relative;
+	left: -30px;
+}
+
 ul.thumbnails li {
 	position: relative;
 }
@@ -175,15 +198,24 @@ li > .loading {
 	visibility: hidden;
 	position: absolute;
 }
-ul.img-list li > .wait,
-ul.img-list li > .loading {
+ul.img-list  > li > .wait {
+	left: 40%;
 	top: 45%;
-	left: 85px;
 }
-ul.svg-list li > .wait,
-ul.svg-list li > .loading {
+ul.svg-list  > li > .wait {
 	top: 45%;
 	left: 45%;
+}
+li > .loading {
+	left: 45%;
+	top: 40%;
+}
+li > .loading > i {
+	color: #0044cc;
+}
+li > .loading > span {
+	left: -12px;
+	font-weight: bold;
 }
 li.wait .wait,
 li.loading .loading {
@@ -191,7 +223,7 @@ li.loading .loading {
 }
 li.wait img,
 li.wait .thumbnail {
-	opacity: 0.05;
+	opacity: 0.1;
 }
 li.loading img,
 li.loading .thumbnail {
