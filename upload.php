@@ -38,8 +38,12 @@ if( !$imagehand->processed ) throw new Exception("Error upload $fileName");
 
 sleep(3);
 
-// create data uri
+$imgURL     = 'http://dev.angularjs/_learn_/angularjs-banner-editor/uploads/' . $imagehand->file_dst_name;
+$imgDataUri = 'data:' . $fileType . ';base64,' . base64_encode(file_get_contents($imagehand->file_dst_pathname));
+
+// send response
 echo json_encode(array(
-	'url' => 'http://dev.angularjs/_learn_/angularjs-banner-editor/uploads/' . $imagehand->file_dst_name
+	'url'     => $imgURL,
+	'dataURI' => $imgDataUri
 ));
 ?>

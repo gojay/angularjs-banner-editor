@@ -1,29 +1,64 @@
 /**
- * BannerApp Module
+ * ImageCreatorApp Module
  *
  * Description
  */
-angular.module('BannerApp', ['BannerProvider', 'BannerControllers', 'BannerComponents', 'BannerFilters'])
-	.config(['$routeProvider', 'debugProvider', 'imageReaderProvider',
-		function($routeProvider, debugProvider, imageReaderProvider){
+angular.module('ImageCreatorApp', ['ImageCreatorProvider', 'ImageCreatorControllers', 'ImageCreatorComponents', 'ImageCreatorFilters'])
+	.config(['$routeProvider', '$locationProvider', 'debugProvider', 'PageProvider', 'transitionProvider', 'imageReaderProvider',
+		function($routeProvider, $locationProvider, debugProvider, PageProvider, transitionProvider, imageReaderProvider){
 			// enable/disable debuging
 			debugProvider.setDebug(true);
+			// transition config  
+			transitionProvider.setStartTransition('expandIn');
+			transitionProvider.setPage('html');
+			transitionProvider.setPageTransition('slide');
 			// routes
 			$routeProvider
 				.when('/', {
 					templateUrl : 'partials/home.html',
-					controller  : 'BannerEditor'
+					controller  : 'HomeController',
+					resolve: {
+						delay: function($q, $timeout) {
+							var delay = $q.defer();
+							$timeout(delay.resolve, 1000);
+							return delay.promise;
+						}
+					}
 				})
-				.when('/page', {
-					template    : '<page-editor></page-editor>'
+				.when('/banner', {
+					templateUrl : 'partials/banner.html',
+					controller  : 'BannerController',
+					resolve: {
+						delay: function($q, $timeout) {
+							var delay = $q.defer();
+							$timeout(delay.resolve, 1000);
+							return delay.promise;
+						}
+					}
+				})
+				.when('/feed', {
+					template    : '<feed-creator></feed-creator>',
+					controller  : 'FeedController',
+					resolve: {
+						delay: function($q, $timeout) {
+							var delay = $q.defer();
+							$timeout(delay.resolve, 1000);
+							return delay.promise;
+						}
+					}
 				})
 				.otherwise({ redirectTo:'/' });
-		}
-	]);
 
-function navController($scope){
-	$scope.index = 0;
-	$scope.navClick = function(index){
-		$scope.index = index;
-	};
-}
+			// $locationProvider.html5Mode(true);
+		}
+	])
+	.run(function($rootScope, transition) {
+		$rootScope.$on('$routeChangeStart', function(scope, next, current) {
+			console.log('Changing from '+angular.toJson(current)+' to '+angular.toJson(next));
+			if(current === undefined){
+				transition.start();
+			} else {
+				transition.change();
+			}
+		});
+	});

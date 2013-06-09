@@ -1,10 +1,21 @@
 /**
- * BannerControllers Module
+ * ImageCreatorControllers Module
  *
  * Description
  */
-angular.module('BannerControllers', [])
-	.controller('BannerEditor', function($scope, $compile, imageReader){
+angular.module('ImageCreatorControllers', [])
+	.controller('MainController', function($scope, Page, transition){
+		$scope.page = Page;
+	})
+	.controller('HomeController', function($scope, Page, transition){
+		// set title n disable content
+		Page.setTitle('');
+		Page.isContent = false;
+	})
+	.controller('BannerController', function($scope, Page, transition, imageReader){
+		// set title n enable content
+		Page.setTitle('| Banner');
+		Page.isContent = true;
 		// banner model
 		$scope.banner = {
 			title : {
@@ -198,14 +209,14 @@ angular.module('BannerControllers', [])
 
 			// alert overwrite
 			if($btnTemplate.hasClass('overwrite')){
-				$('#alert-overwrite').bind('overwrite', function(){
+				$('#popup-overwrite').bind('overwrite', function(){
 					var self = this;
 					$('.blockOverlay').click();
 					bannerSetting(settings, true);
 				});
 				// show message
 				$.blockUI({
-					message: $('#alert-overwrite'),
+					message: $('#popup-overwrite'),
 					css: {
 						background : 'transparent',
 						border     : 'none',
@@ -234,7 +245,7 @@ angular.module('BannerControllers', [])
 		};
 
 		$scope.overwiriteTplYes = function(evt){
-			$('#alert-overwrite').trigger('overwrite');
+			$('#popup-overwrite').trigger('overwrite');
 		};
 		$scope.overwiriteTplNo = function(evt){
 			$('.blockOverlay').click();
@@ -754,18 +765,17 @@ angular.module('BannerControllers', [])
 			}
 		};
 
-		function createCanvas(svg, canvasDimensions, callback){
+		function createCanvas(svg, callback){
 			var svg_xml = (new XMLSerializer()).serializeToString(svg);
-			console.log(svg_xml);
-			var canvas    = document.createElement('canvas');
-			canvas.width  = canvasDimensions.width;
-			canvas.height = canvasDimensions.height;
+			var canvas  = document.createElement('canvas');
 			// get canvas context
 			var ctx = canvas.getContext("2d");
 			var img = new Image();
 			img.onload = function(){
+				canvas.width  = img.width;
+				canvas.height = img.height;
 				ctx.drawImage(img, 0, 0);
-				var imgDataURI = canvas.toDataURL('image/png');
+				var imgDataURI = canvas.toDataURL('image/jpeg');
 				callback(img, imgDataURI);
 			};
 			img.src = "data:image/svg+xml;base64," + btoa(svg_xml);
@@ -774,7 +784,7 @@ angular.module('BannerControllers', [])
 		// SVG to dataURI
 		$scope.convert = function(evt){
 			$.blockUI({
-				message: $('#loading-problem'),
+				message: $('#popup-loading-img'),
 				overlayCSS:{
 					opacity : '0.8'
 				},
@@ -791,9 +801,9 @@ angular.module('BannerControllers', [])
 			var svg_like  = $('#svg-editor > svg').eq(0)[0];
 			var svg_enter = $('#svg-editor > svg').eq(1)[0];
 			// get canvas dimensions
-			var canvasDimensions = JSON.parse($('input[name="canvasDimensions"]').val());
+			// var canvasDimensions = JSON.parse($('input[name="canvasDimensions"]').val());
 			// create canvas banner like
-			createCanvas(svg_like, canvasDimensions, function(imgLike, imgDataURILike){
+			createCanvas(svg_like, function(imgLike, imgDataURILike){
 				// create download anchor
 				var downloadLinkLike       = document.createElement('a');
 				downloadLinkLike.title     = 'Download Banner Like';
@@ -803,7 +813,7 @@ angular.module('BannerControllers', [])
 				downloadLinkLike.innerHTML = '<i class="icon-download-alt"></i> Download Banner Like';
 				downloadLinkLike.download  = 'banner-like.png';
 				// create canvas banner enter
-				createCanvas(svg_enter, canvasDimensions, function(imgEnter, imgDataURIEnter){
+				createCanvas(svg_enter, function(imgEnter, imgDataURIEnter){
 					// create download anchor
 					var downloadLinkEnter       = document.createElement('a');
 					downloadLinkEnter.title     = 'Download Banner Enter';
@@ -816,7 +826,7 @@ angular.module('BannerControllers', [])
 					imgLike.className  = 'span12';
 					imgEnter.className = 'span12';
 					// define generate element
-					var $generate = $('#result-generate-image-modal');
+					var $generate = $('#popup-result-generate-image-modal');
 					var $generateBody = $generate.find('.modal-body');
 					// create template banner list
 					var tplImages = '<li class="span6 banner-like">' +
@@ -1006,4 +1016,9 @@ angular.module('BannerControllers', [])
 				type: mimeString
 			});
 		}
+	})
+	.controller('FeedController', function($scope, Page, transition){
+		// set title n enable content
+		Page.setTitle('| Feed');
+		Page.isContent = true;
 	});

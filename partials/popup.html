@@ -1,0 +1,28 @@
+<div id="popup-overwrite" style="display: none; width: 649px; height: 479px; position: relative; background: url('images/ragecomic-focused.png') no-repeat; background-position: -1px -1px; font-size: 19px; line-height: 35px;"> 
+	<div class="message" style="position: absolute;right: 7%;top: 37px; width: 352px;height: 120px;">
+	    <p style="font-weight: bold; margin: 10px 10px 0;">Hey wait..<br/>I had chosen before.<br/>Do you want to overwrite it ?</p> 
+	    <p class="text-center" style="padding: 0 10px;position: absolute;top: 107px;right: 119px;">
+		    <button class="btn-link" ng-click="overwiriteTplYes($event)">Yes</button>
+		    <button class="btn-link" ng-click="overwiriteTplNo($event)">No</button>
+	    </p>
+	</div>
+</div>
+<div id="popup-result-generate-image" class="hide container">
+	<div class="row-fluid">
+		<ul class="thumbnails" style="margin: 15px 15px 0; text-align: left;"></ul>
+	</div>
+</div>
+<div id="popup-result-generate-image-modal" class="modal modal-large hide fade">
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
+		<h3>Generate Images</h3>
+	</div>
+	<div class="modal-body">
+		<ul class="thumbnails" style="margin: 15px 15px 0; text-align: left;"></ul>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn btn-primary">Download as Zip</a>
+		<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+	</div>
+</div>
+<img id="popup-loading-img" class="hide" src="images/loading-problem.png" width="375" height="350" />

@@ -1,10 +1,10 @@
 /**
- * BannerFilters Module
+ * ImageCreatorFilters Module
  *
  * Description
  */
 
- angular.module('BannerFilters', [])
+ angular.module('ImageCreatorFilters', [])
 	.filter('comaToNewLine', function() {
 		return function(input) {
 			return input.replace(/,/g, '<div style="clear:both; margin-top:5px;"></div>');
