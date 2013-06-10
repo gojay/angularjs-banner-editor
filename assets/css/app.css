@@ -1,4 +1,5 @@
-html {
+
+html, body {
 	height: 100%;
 }
 
@@ -6,6 +7,31 @@ a:hover {
 	text-decoration: none;
 }
 
+ /* Wrapper for page content to push down footer */
+#wrap {
+	overflow: auto;
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	/* Negative indent footer by it's height */
+	margin: 0 auto -60px;
+}
+
+/* Set the fixed height of the footer here */
+#push,
+#footer {
+	height: 60px;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+	#footer {
+		margin-left: -20px;
+	  	margin-right: -20px;
+	  	padding-left: 20px;
+	  	padding-right: 20px;
+	}
+}
 /* helper */
 
 .full-height {
@@ -13,6 +39,12 @@ a:hover {
 }
 .prefix {
 	margin-left: 0 !important;
+}
+.margin-top-zero {
+	margin-top: 0 !important;
+}
+.margin-bottom-zero {
+	margin-top: 0 !important;
 }
 .margin-top-bottom-jumbo {
 	margin-top: 40px;
@@ -93,6 +125,9 @@ a:hover {
 }
 .marketing p + h4 {
 	margin-top: 28px;
+}
+.marketing + hr {
+	display: none;
 }
 
 .modal-large{
@@ -385,4 +420,9 @@ input#spinner {
 #page-feed section.active > .drop-element,
 #page-feed section.active > .drop-element-2 {
 	display:block;
+}
+#page-feed section.active > .editor-wrapper {
+	position: relative;
+	min-height: 350px;
+	margin:20px 0;
 }

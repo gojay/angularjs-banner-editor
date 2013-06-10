@@ -8,11 +8,6 @@ html {
 	background: gray;
 }
 
-html, body {
-	height: 100%;
-	overflow: hidden;
-}
-
 .after-animation {
 	height: auto;
 	overflow: auto !important;

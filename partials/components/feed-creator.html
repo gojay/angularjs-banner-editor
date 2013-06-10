@@ -1,10 +1,4 @@
 <div id="page-feed" class="span12">
-	<!-- <div id="upload-template" class="margin-top-bottom well-transparent">
-		<button id="button-main-template" class="btn btn-primary">Template</button>
-		<button id="button-background-template" class="btn btn-primary" ng-disabled="disableInputBG">Backgrounds</button>
-		<input type="file" name="main-template" id="input-main-template" class="hide">
-		<input type="file" name="file[]" id="input-background-template" class="hide" multiple>
-	</div> -->
 	<section id="add-template" class="row-fluid active">
 		<h2>1. Select a Template</h2>
 		<div class="drop-element margin-top-bottom">
@@ -85,7 +79,7 @@
 			<span class="drop-over">Drop files here!</span>
 		</div>
 		<div id="canvas"></div>
-		<div class="margin-top-bottom" style="position: relative; min-height: 350px">
+		<div class="editor-wrapper">
 			<div class="loading"><i class="icon-spinner icon-spin icon-4x"></i> <span>Perparing Images..</span></div>
 			<div class="editor">
 				<div class="container">
@@ -118,42 +112,6 @@
 					</div>
 				</div>
 			</div>
-			
 		</div>
 	</section>
-	<!-- <div id="page-templates" style="min-height:350px">
-		<div id="canvas"></div>
-		<div class="loading"><i class="icon-spinner icon-spin icon-4x"></i> <span>Perparing Images..</span></div>
-		<div class="editor">
-			<div class="container">
-				<div class="row-fluid">
-					<div class="span12 well">
-						<div class="span8 queue">
-							<div class="span10 progress progress-striped active" style="margin-bottom: 0;">
-								<div class="bar"><span></span></div>
-							</div>
-							<span class="span2" style="margin-top: 5px;">{{finishedImages}} / {{countImages}}</span>
-						</div>
-						<div class="span4 text-right">
-							<a href id="downloadZip" class="btn btn-success" ng-disabled="isDownloadDisabled"><i class="icon-download-alt"></i> Download as Zip</a>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="tabbable">
-				<ul class="nav nav-tabs">
-					<li class="active"><a href="#tab-img" data-toggle="tab">Selected</a></li>
-					<li><a href="#tab-svg" data-toggle="tab">Generated</a></li>
-				</ul>
-				<div class="tab-content">
-					<div class="tab-pane active" id="tab-img">
-						<ul class="thumbnails img-list"></ul>
-					</div>
-					<div class="tab-pane" id="tab-svg">
-						<ul class="thumbnails svg-list"></ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> -->
 </div>

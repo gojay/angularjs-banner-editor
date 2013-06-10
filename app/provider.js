@@ -100,8 +100,8 @@ angular.module('ImageCreatorProvider', [])
 					$('body').addClass(startTransition);
 					setTimeout(function(){
 						console.log('change html, body css');
-						$('html').css({'height':'auto', 'overflow':'auto', 'background':'#fff'});
-						$('body').css({'height':'auto', 'overflow':'auto'}).removeClass(startTransition);
+						$('html').css({'background':'#fff'});
+						$('body').removeClass(startTransition);
 					}, 1000);
 				},
 				change: function(){
