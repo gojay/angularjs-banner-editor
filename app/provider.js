@@ -313,7 +313,7 @@ angular.module('ImageCreatorProvider', [])
 
 							console.log('response', response);
 
-							if( callback ) callback( response.url );
+							if( callback ) callback( response );
 
 						}
 						else

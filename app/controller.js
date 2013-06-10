@@ -450,9 +450,9 @@ angular.module('ImageCreatorControllers', [])
 												file: blob,
 												name: 'background',
 												size: backgroundDimension
-											}, function(imgUrl){
+											}, function(response){
 												for(var i in changeEl){
-													changeEl[i].setAttribute('xlink:href',imgUrl);
+													changeEl[i].setAttribute('xlink:href',response.dataURI);
 												}
 												$editorSVG.unblock();
 											});
@@ -629,9 +629,9 @@ angular.module('ImageCreatorControllers', [])
 											file: blob,
 											name: 'prize',
 											size: priceDimension
-										}, function(imgUrl){
+										}, function(response){
 											for(var j in changeEl){
-												changeEl[j].setAttribute('xlink:href',imgUrl);
+												changeEl[j].setAttribute('xlink:href',response.dataURI);
 											}
 											$editorSVG.unblock();
 										});
