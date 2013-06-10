@@ -191,38 +191,45 @@ a:hover {
 
 /* drop area */
 
-#drop-element {
+.drop-element,
+.drop-element-2 {
 	height: 100px;
 	text-align: center;
 	border: 2px dashed #ddd;
 	padding: 20px 10px;
 }
 
-#drop-element .drop-instructions {
+.drop-element .drop-instructions,
+.drop-element-2 .drop-instructions {
 	display: block;
 	height: 30px;
 }
 
-#drop-element .drop-over {
+.drop-element .drop-over,
+.drop-element-2 .drop-over {
 	display: none;
 	font-size: 25px;
 	height: 30px;
 }
 		
-#drop-element.over {
+.drop-element.over,
+.drop-element-2.over {
 	background: #ffffa2;
 	border: 2px dashed #000;
 }
 
-#drop-element.over .drop-instructions {
+.drop-element.over .drop-instructions,
+.drop-element-2.over .drop-instructions {
 	display: none;
 }
 
-#drop-element.over .drop-over {
+.drop-element.over .drop-over,
+.drop-element-2.over .drop-over {
 	display: block;
 }
 
-#drop-element.over .drop-over {
+.drop-element.over .drop-over,
+.drop-element-2.over .drop-over {
 	display: block;
 	font-size: 25px;
 }
@@ -252,20 +259,20 @@ input[type="checkbox"] ~ label {
 	margin: 0 5px;
 }
 
-/* page */
+/* background */
 
-#page-templates {
+#add-background {
 	position: relative;
 }
-#page-templates > .loading,
-#page-templates > .editor{
+#add-background .loading,
+#add-background .editor{
 	display: none;
 }
-#page-templates.prepare > .loading,
-#page-templates.ready > .editor{
+#add-background.prepare .loading,
+#add-background.ready .editor{
 	display: block;
 }
-#page-templates > .loading{
+#add-background .loading{
 	position: absolute;
 	top: 38%;
 	left: 47%;
@@ -354,4 +361,26 @@ li.generate .thumbnail {
 input#spinner {
 	margin-bottom:0.2em; 
 	font-size:14px
+}
+
+#page-feed section {
+	-webkit-transition: all 1s ease;
+    -moz-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    transition: all 1s ease;
+}
+
+#page-feed section h2 {
+	color:#ddd;
+}
+
+#page-feed section .drop-element,
+#page-feed section .editor {
+	display:none;
+}
+#page-feed section.active h2 {
+	color:#333;
+}
+#page-feed section.active > .drop-element {
+	display:block;
 }

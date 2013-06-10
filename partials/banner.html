@@ -15,6 +15,99 @@
 	</div>
 	<button class="btn btn-primary btn-block" ng-click="doSetting($event)"><i class="icon-cog"></i> Settings</button>
 	<button id="cancelTpl" class="btn btn-block hide" ng-click="cancelTemplate($event)">Cancel</button>
+	<!-- Button to trigger modal -->
+	<a href="#modal-icons" role="button" class="btn btn-primary btn-block" style="width:270px;height: 30px;" data-toggle="modal">Tab Images and Icons</a>
+	<!-- Modal -->
+	<div id="modal-icons" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:690px">
+		<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><img src="images/popup-close.gif" width="22" height="22" alt="" /></button>
+		<h3 id="myModalLabel">Copy Url Tab Images and Icons</h3>
+		</div>
+		<div class="modal-body">
+			<div id="popup-form">
+				<div class="popupfloaticon" style="float:left;margin-right:10px; width:315px;height:Auto;">
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span style="width:50px;float: left;margin-right: 10px;">
+							<img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/about-tab.jpg" width="45" height="30" alt="">
+						</span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/about-tab.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span style="width: 50px;float: left;margin-right: 10px;"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/contact-tab.jpg" width="45" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/contact-tab.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span style="width: 50px;float: left;margin-right: 10px;"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/location-tab.jpg" width="45" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/location-tab.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span style="width: 50px;float: left;margin-right: 10px;"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/listing-tab.jpg" width="45" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/listing-tab.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span style="width: 50px;float: left;margin-right: 10px;"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/contest-tab.jpg" width="45" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/contest-tab.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span style="width:50px;float: left;margin-right: 10px;">
+							<img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/testimonial-tab.jpg" width="45" height="30" alt="">
+						</span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/testimonial-tab.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span style="width: 50px;float: left;margin-right: 10px;"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/product-tab.jpg" width="45" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/product-tab.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span style="width: 50px;float: left;margin-right: 10px;"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/promotion-tab.jpg" width="45" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/promotion-tab.jpg" style="width:225px;"/>
+					</div>
+				</div>
+				<div class="popupfloaticon" style="float:left;width:315px;height:Auto;">
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span class="spanimages">
+							<img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/about-icon.jpg" width="20" height="30" alt="">
+						</span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/about-icon.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span class="spanimages"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/contact-icon.jpg" width="20" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/contact-icon.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span class="spanimages"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/location-icon.gif" width="20" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/location-icon.gif" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span class="spanimages"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/listing-icon.jpg" width="20" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/listing-icon.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span class="spanimages"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/contest-icon.jpg" width="20" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/contest-icon.jpg" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span class="spanimages">
+							<img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/testimonial-icon.gif" width="20" height="30" alt="">
+						</span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/testimonial-icon.gif" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span class="spanimages"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/product-icon.png" width="20" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/product-icon.png" style="width:225px;"/>
+					</div>
+					<div class="popup-form-row" style="width:325px;float:left;">
+						<span class="spanimages"><img src="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/promotion-icon.jpg" width="20" height="30" alt=""></span>
+						<input name="emailto" type="text"  class="required" value="http://secure.conversion-hub.com/apps/chm/banner-creator/icons/promotion-icon.jpg" style="width:225px;"/>
+					</div>
+				</div>					
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		</div>
+	</div>
 	<div id="settings" class="hide margin-top-bottom">
 		<div ng-include src="'partials/banner-setting.html'"></div>
 	</div>

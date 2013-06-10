@@ -104,7 +104,7 @@ angular.module('ImageCreatorComponents', [])
 			}
 		};
 	})
-	.directive('feedCreator', function(Page, $compile){
+	.directive('feedCreator', function(Page, imageReader, $compile){
 		// Runs during compile
 		return {
 			restrict: 'EAC', // E = Element, A = Attribute, C = Class, M = Comment
@@ -113,6 +113,11 @@ angular.module('ImageCreatorComponents', [])
 			controller: function($scope, $element, $attrs, $transclude) {
 
 				/* section : template */
+
+				this.sectionTpl = $('#add-template');
+				this.sectionBg  = $('#add-background');
+				this.buttonTpl  = $('#btn-upload-template');
+				this.buttonBg   = $('#btn-upload-backgrounds');
 
 				$scope.bg = {
 					type  : 0,
@@ -124,6 +129,15 @@ angular.module('ImageCreatorComponents', [])
 				$scope.$watch('bg.radius', function(radius){
 					$scope.bg.radius = radius;
 				});
+				// http://api.jqueryui.com/spinner/#entry-examples
+				$("#spinner").spinner({
+					min:0, max: 100,
+					spin: function( event, ui ) {
+						$scope.$apply(function(scope){
+							scope.bg.radius = ui.value;
+						});
+					}
+				});
 				$scope.$watch('isHiddenTpl', function(isHidden){
 					var opacity = isHidden ? 0.2 : 1;
 					$('#preview-tpl > svg > image').css('opacity', opacity);
@@ -131,6 +145,8 @@ angular.module('ImageCreatorComponents', [])
 
 				$scope.doNextStep = function(){
 					console.log($scope);
+					self.sectionTpl.removeClass('active').find('.editor').hide();
+					self.sectionBg.addClass('active');
 				};
 
 				/* section : background */
@@ -146,31 +162,33 @@ angular.module('ImageCreatorComponents', [])
 				this.zip = new JSZip();
 
 				// handle single file (template image)
-				this.handleTplFile = function(evt){
-					var file = evt.target.files[0];
+				this.handleTplFile = function(file){
 					// validation file image selected
 					self.imageValidation(file);
 					// file reader
 					var fileReader = new FileReader();
 					fileReader.onload = function(e){
 						self.imageTpl = e.target.result;
-						$scope.$apply(function(scope){
-							scope.disableInputBG = false;
-						});
+						// set image svg template
+						$('#preview-tpl > svg > image')[0].setAttribute('xlink:href', e.target.result);
+						// show editor
+						$('.editor', self.sectionTpl).show(500);
+						// edit button text
+						var btn = self.buttonTpl[0];
+						btn.innerHTML = btn.innerHTML.replace(/add/i, 'Edit');
 					};
 					// read as data uri
 					fileReader.readAsDataURL(file);
 				};
 				// handle multiple files (background images)
-				this.handleMultipleFiles = function(evt){
-					var files      = evt.target.files;
+				this.handleMultipleFiles = function(files){
 					var countFiles = files.length;
 					var requests   = [];
 					var sizes      = 0;
 					// check image tpl is exists
 					if( self.imageTpl === undefined ) return;
 					// preparing page
-					$('#page-templates').addClass('prepare');
+					$('#add-background').addClass('prepare');
 					// looping files
 					angular.forEach(files, function(file,i){
 						// validation file image selected
@@ -179,11 +197,14 @@ angular.module('ImageCreatorComponents', [])
 						var fileReader = new FileReader();
 						fileReader.onload = (function(blob){
 							return function(e){
+								var rx = $scope.bg.radius;
 								var svg    = SVG('canvas').size(403, 403);
-								var imgBG  = svg.image(e.target.result, 395, 395);
+								var rect   = svg.rect(403, 403).attr('rx', rx);
+								var imgBG  = svg.image(e.target.result, 403, 403);
 								var imgTpl = svg.image(self.imageTpl, 403, 403);
 								// add svg id
 								svg.attr('id', 'svg-page-' + index);
+								imgBG.clipWith(rect);
 								imgBG.attr({
 									x:5,
 									y:5,
@@ -203,7 +224,7 @@ angular.module('ImageCreatorComponents', [])
 									callback = function(){
 										console.info('start chainedMultipleUpload...');
 										setTimeout(function() {
-											$('#page-templates').removeClass('prepare').addClass('ready');
+											$('#add-background').removeClass('prepare').addClass('ready');
 											$scope.$apply(function(scope){
 												scope.countImages = countFiles;
 											});
@@ -261,7 +282,7 @@ angular.module('ImageCreatorComponents', [])
 									'<div class="generate"><i class="icon-spinner icon-spin icon-4x"></i> <span>Generating..</span></div>'+
 									'<img id="'+ data.id +'" src="'+ data.imguri +'" />'+
 								'</li>';
-					$('#page-templates ul.img-list').append($li);
+					$('#add-background ul.img-list').append($li);
 				};
 				this.addSVGList = function(svg, callback){
 					var $thumb = $('<div class="thumbnail border-none text-center"></div>').append($(svg).attr('style',''));
@@ -271,7 +292,7 @@ angular.module('ImageCreatorComponents', [])
 									'<div class="generate"><i class="icon-spinner icon-spin icon-4x"></i> <span>Generating..</span></div>'+
 									$thumb.prop('outerHTML') +
 								'</li>';
-					$('#page-templates ul.svg-list').append($li);
+					$('#add-background ul.svg-list').append($li);
 					if(callback) callback();
 				};
 
@@ -298,9 +319,9 @@ angular.module('ImageCreatorComponents', [])
 							return self.uploadFile({
 								file  : request.blob,
 								name  : 'bg-' + request.index,
-								width : 395,
-								height: 395,
-								crop  : true
+								width : 403,
+								height: 403,
+								crop  : $scope.bg.crop
 							}).pipe(function(response){
 								console.log('response', index, response);
 								// change bg image
@@ -312,7 +333,7 @@ angular.module('ImageCreatorComponents', [])
 								// generate image
 								return self.generateImage($svgIndex[0]).done(function(imgDataURI){
 									// add to zip
-									self.zip.file('image-'+index+'.jpg', imgDataURI, {base64: true});
+									self.zip.file('image_'+index+'.jpg', imgDataURI, {base64: true});
 									// applying finished images
 									$scope.$apply(function(scope){
 										scope.finishedImages = index;
@@ -377,11 +398,12 @@ angular.module('ImageCreatorComponents', [])
 						canvas.height = img.height;
 						// draw image
 						ctx.drawImage(img, 0, 0);
-						// convert to image jpeg
-						var imgDataURI = canvas.toDataURL('image/jpeg');
+						// convert to image png
+						var imgDataURI = canvas.toDataURL('image/jpg');
 						// send response
 						setTimeout(function() {
-							deferred.resolve(imgDataURI);
+							var img = imgDataURI.replace(/^data:image\/(png|jpg);base64,/, "");
+							deferred.resolve(img);
 						}, 2000);
 					};
 					img.src = "data:image/svg+xml;base64," + btoa(svg_xml);
@@ -390,26 +412,103 @@ angular.module('ImageCreatorComponents', [])
 				};
 			},
 			link: function($scope, iElm, iAttrs, controller) {
-				// http://api.jqueryui.com/spinner/#entry-examples
-				$("#spinner").spinner({
-					min:0, max: 100,
-					spin: function( event, ui ) {
-						console.log(ui.value);
-						$scope.$apply(function(scope){
-							scope.bg.radius = ui.value;
-						});
-					}
+
+				/* template event listener */
+
+				// button file
+				controller.buttonTpl.click(function() {
+					$('#input-upload-template').click();
 				});
-				// event listener button input file
-				$('#button-main-template').click(function() {
-					$('#input-main-template').click();
+				// input file
+				$('#input-upload-template').bind('change', function(evt){
+					controller.handleTplFile(evt.target.files[0]);
 				});
-				$('#button-background-template').click(function() {
-					$('#input-background-template').click();
+				var $dropAreaTpl = $('.drop-element', controller.sectionTpl);
+				// drag n drop events
+				$dropAreaTpl
+					// event drop 
+					.bind('drop', function(evt){
+						evt.stopPropagation();
+						evt.preventDefault();
+
+						$dropAreaTpl.removeClass('over');
+
+						var original = evt.originalEvent,
+							file     = original.dataTransfer.files[0];
+
+						console.log('drop file', file);
+
+						controller.handleTplFile(file);
+					})
+					// event drag over
+					.bind('dragover', function(evt) {
+						evt.stopPropagation();
+						evt.preventDefault();
+					})
+					// event drag enter
+					.bind('dragenter', function(evt) {
+						evt.stopPropagation();
+						evt.preventDefault();
+						$dropAreaTpl.addClass('over');
+					})
+					// event drag leave
+					.bind('dragleave', function(evt) {
+						evt.stopPropagation();
+						evt.preventDefault();
+
+						var target = evt.target;
+						if ($(this).find(evt.target).length) {
+							$dropAreaTpl.removeClass('over');
+						}
+					});
+
+				/* backgrounds event listener */
+
+				// button file
+				controller.buttonBg.click(function() {
+					$('#input-upload-backgrounds').click();
 				});
-				// event listener input file
-				$('#input-main-template').bind('change', controller.handleTplFile);
-				$('#input-background-template').bind('change', controller.handleMultipleFiles);
+				$('#input-upload-backgrounds').bind('change', function(evt){
+					controller.handleMultipleFiles(evt.target.files);
+				});
+				// drag n drop events
+				var $dropAreaBG = $('.drop-element-2', controller.sectionBg);
+				$dropAreaBG
+					// event drop 
+					.bind('drop', function(evt){
+						evt.stopPropagation();
+						evt.preventDefault();
+
+						$dropAreaTpl.removeClass('over');
+
+						var original = evt.originalEvent,
+							files    = original.dataTransfer.files;
+
+						console.log('drop file', files);
+
+						controller.handleMultipleFiles(files);
+					})
+					// event drag over
+					.bind('dragover', function(evt) {
+						evt.stopPropagation();
+						evt.preventDefault();
+					})
+					// event drag enter
+					.bind('dragenter', function(evt) {
+						evt.stopPropagation();
+						evt.preventDefault();
+						$dropAreaTpl.addClass('over');
+					})
+					// event drag leave
+					.bind('dragleave', function(evt) {
+						evt.stopPropagation();
+						evt.preventDefault();
+
+						var target = evt.target;
+						if ($(this).find(evt.target).length) {
+							$dropAreaTpl.removeClass('over');
+						}
+					});
 			}
 		};
 	});

@@ -12,7 +12,7 @@ angular.module('ImageCreatorControllers', [])
 		Page.setTitle('');
 		Page.isContent = false;
 	})
-	.controller('BannerController', function($scope, Page, transition, imageReader){
+	.controller('BannerController', function($scope, $compile, Page, transition, imageReader){
 		// set title n enable content
 		Page.setTitle('| Banner');
 		Page.isContent = true;
