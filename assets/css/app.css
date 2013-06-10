@@ -375,6 +375,7 @@ input#spinner {
 }
 
 #page-feed section .drop-element,
+#page-feed section .drop-element-2,
 #page-feed section .editor {
 	display:none;
 }
