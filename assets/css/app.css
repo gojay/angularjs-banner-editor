@@ -382,6 +382,7 @@ input#spinner {
 #page-feed section.active h2 {
 	color:#333;
 }
-#page-feed section.active > .drop-element {
+#page-feed section.active > .drop-element,
+#page-feed section.active > .drop-element-2 {
 	display:block;
 }
