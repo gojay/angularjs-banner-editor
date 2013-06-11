@@ -10,8 +10,8 @@ angular.module('ImageCreatorApp', ['ImageCreatorProvider', 'ImageCreatorControll
 			debugProvider.setDebug(true);
 			// transition config  
 			transitionProvider.setStartTransition('expandIn');
+			transitionProvider.setPageTransition('tumble');
 			transitionProvider.setPage('html');
-			transitionProvider.setPageTransition('slide');
 			// routes
 			$routeProvider
 				.when('/', {
@@ -55,10 +55,6 @@ angular.module('ImageCreatorApp', ['ImageCreatorProvider', 'ImageCreatorControll
 	.run(function($rootScope, transition) {
 		$rootScope.$on('$routeChangeStart', function(scope, next, current) {
 			console.log('Changing from '+angular.toJson(current)+' to '+angular.toJson(next));
-			if(current === undefined){
-				transition.start();
-			} else {
-				transition.change();
-			}
+			transition.change();
 		});
 	});

@@ -5,7 +5,7 @@ html {
     -webkit-perspective: 500px;
 	-webkit-perspective-origin-x: 50%;
 	-webkit-perspective-origin-y: 50%;
-	background: gray;
+	/*background: gray;*/
 }
 
 .after-animation {

@@ -156,6 +156,16 @@ angular.module('ImageCreatorComponents', [])
 				$scope.finishedImages = 0;
 				$scope.countImages    = 0;
 
+				$scope.createNew = function(){
+					self.sectionBg
+						.removeClass('active ready')
+						.find('ul.thumbnails')
+						.each(function(){
+							$(this).html('');
+						});
+					self.sectionTpl.addClass('active');
+				};
+
 				var self  = this;
 				var index = 1;
 

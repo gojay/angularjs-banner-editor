@@ -775,7 +775,7 @@ angular.module('ImageCreatorControllers', [])
 				canvas.width  = img.width;
 				canvas.height = img.height;
 				ctx.drawImage(img, 0, 0);
-				var imgDataURI = canvas.toDataURL('image/jpeg');
+				var imgDataURI = canvas.toDataURL('image/jpg');
 				callback(img, imgDataURI);
 			};
 			img.src = "data:image/svg+xml;base64," + btoa(svg_xml);
@@ -797,6 +797,8 @@ angular.module('ImageCreatorControllers', [])
 				}
 			});
 
+			var zip = new JSZip();
+
 			$('#svg-editor > svg').each(function(){ $(this).show(); });
 			var svg_like  = $('#svg-editor > svg').eq(0)[0];
 			var svg_enter = $('#svg-editor > svg').eq(1)[0];
@@ -804,6 +806,9 @@ angular.module('ImageCreatorControllers', [])
 			// var canvasDimensions = JSON.parse($('input[name="canvasDimensions"]').val());
 			// create canvas banner like
 			createCanvas(svg_like, function(imgLike, imgDataURILike){
+				// add banner like to zip
+				var imgURI = imgDataURILike.replace(/^data:image\/(png|jpg);base64,/, "");
+				zip.file('banner_like.jpg', imgURI, {base64: true});
 				// create download anchor
 				var downloadLinkLike       = document.createElement('a');
 				downloadLinkLike.title     = 'Download Banner Like';
@@ -811,9 +816,12 @@ angular.module('ImageCreatorControllers', [])
 				downloadLinkLike.target    = '_blank';
 				downloadLinkLike.className = 'btn btn-success';
 				downloadLinkLike.innerHTML = '<i class="icon-download-alt"></i> Download Banner Like';
-				downloadLinkLike.download  = 'banner-like.png';
+				downloadLinkLike.download  = 'banner-like.jpg';
 				// create canvas banner enter
 				createCanvas(svg_enter, function(imgEnter, imgDataURIEnter){
+					// add banner img to zip
+					var imgURI = imgDataURIEnter.replace(/^data:image\/(png|jpg);base64,/, "");
+					zip.file('banner_enter.jpg', imgURI, {base64: true});
 					// create download anchor
 					var downloadLinkEnter       = document.createElement('a');
 					downloadLinkEnter.title     = 'Download Banner Enter';
@@ -821,7 +829,7 @@ angular.module('ImageCreatorControllers', [])
 					downloadLinkEnter.target    = '_blank';
 					downloadLinkEnter.className = 'btn btn-success';
 					downloadLinkEnter.innerHTML = '<i class="icon-download-alt"></i> Download Banner Enter';
-					downloadLinkEnter.download  = 'banner-enter.png';
+					downloadLinkEnter.download  = 'banner-enter.jpg';
 					// set image class
 					imgLike.className  = 'span12';
 					imgEnter.className = 'span12';
@@ -850,6 +858,13 @@ angular.module('ImageCreatorControllers', [])
 					// append banner images
 					$generateBody.find('ul').html('');
 					$generateBody.find('ul').append(tplImages);
+					// generate zip link
+					var DOMURL = window.URL || window.mozURL;
+					var downloadlink = DOMURL.createObjectURL(zip.generate({type:"blob"}));
+					// get zipe selement n set attribute
+					var zipEl      = $generate.find('.download-zip')[0];
+					zipEl.download = 'banner.zip';
+					zipEl.href     = downloadlink;
 					// open popup
 					setTimeout(function() {
 						$.unblockUI({
@@ -857,25 +872,6 @@ angular.module('ImageCreatorControllers', [])
 								$generate.modal('show');
 							}
 						});
-						/*$.unblockUI({
-							onUnblock: function() {
-								$.blockUI({
-									overlayCSS:{
-										cursor : 'pointer',
-										border : '3px solid #006DCC'
-									},
-									message: $generate,
-									css: {
-										cursor: 'default',
-										top    : ($(window).height() - $generate.height()) / 2 + 'px',
-										left   : ($(window).width() - $generate.width()) / 2 + 'px',
-										width  : $generate.width() + 'px',
-										height : $generate.height() + 'px'
-									}
-								});
-								$('.blockOverlay').attr('title', 'Click to cancel').click($.unblockUI);
-							}
-						});*/
 					}, 1000);
 				});
 			});
