@@ -29,9 +29,9 @@ angular.module('ImageCreatorControllers', [])
 				counter : 255
 			},
 			logo : {
-				w : 122,
-				h : 80,
-				margin : 20
+				w : 0,
+				h : 0,
+				margin : 0
 			},
 			price : {
 				one: {
@@ -104,12 +104,44 @@ angular.module('ImageCreatorControllers', [])
 
 		var dimensions = {
 			'tpl-0' : {
+				logo : {
+					pos : {
+						placeholder:{
+							x:20,
+							y:5
+						},
+						image:{
+							x:25,
+							y:10
+						}
+					},
+					image : {
+						width:122,
+						height:80
+					}
+				},
 				background : {
 					width:810,
 					height:381
 				}
 			},
 			'tpl-1' : {
+				logo : {
+					pos : {
+						placeholder:{
+							x:20,
+							y:5
+						},
+						image:{
+							x:25,
+							y:10
+						}
+					},
+					image : {
+						width:122,
+						height:80
+					}
+				},
 				background : {
 					width:810,
 					height:381
@@ -120,6 +152,22 @@ angular.module('ImageCreatorControllers', [])
 				}
 			},
 			'tpl-2' : {
+				logo : {
+					pos : {
+						placeholder:{
+							x:20,
+							y:5
+						},
+						image:{
+							x:25,
+							y:10
+						}
+					},
+					image : {
+						width:122,
+						height:80
+					}
+				},
 				background : {
 					width:810,
 					height:339
@@ -130,6 +178,22 @@ angular.module('ImageCreatorControllers', [])
 				}
 			},
 			'tpl-3' : {
+				logo : {
+					pos : {
+						placeholder:{
+							x:20,
+							y:5
+						},
+						image:{
+							x:25,
+							y:10
+						}
+					},
+					image : {
+						width:122,
+						height:80
+					}
+				},
 				background : {
 					width:770,
 					height:315
@@ -140,6 +204,22 @@ angular.module('ImageCreatorControllers', [])
 				}
 			},
 			'tpl-4' : {
+				logo : {
+					pos : {
+						placeholder:{
+							x:129,
+							y:9
+						},
+						image:{
+							x:134,
+							y:14
+						}
+					},
+					image : {
+						width:226,
+						height:56
+					}
+				},
 				background : {
 					width:810,
 					height:339
@@ -150,6 +230,22 @@ angular.module('ImageCreatorControllers', [])
 				}
 			},
 			'tpl-5' : {
+				logo : {
+					pos : {
+						placeholder:{
+							x:79,
+							y:9
+						},
+						image:{
+							x:84,
+							y:14
+						}
+					},
+					image : {
+						width:226,
+						height:56
+					}
+				},
 				background : {
 					width:810,
 					height:339
@@ -160,6 +256,22 @@ angular.module('ImageCreatorControllers', [])
 				}
 			},
 			'tpl-6' : {
+				logo : {
+					pos : {
+						placeholder:{
+							x:129,
+							y:9
+						},
+						image:{
+							x:134,
+							y:14
+						}
+					},
+					image : {
+						width:226,
+						height:56
+					}
+				},
 				background : {
 					width:810,
 					height:339
@@ -280,6 +392,7 @@ angular.module('ImageCreatorControllers', [])
 
 			// canvas dimensions
 			var canvasDimensions    = dimensions[tplDimension];
+			var logoDimension       = canvasDimensions['logo'];
 			var backgroundDimension = canvasDimensions['background'];
 			var priceDimension      = canvasDimensions['price'];
 
@@ -440,7 +553,7 @@ angular.module('ImageCreatorControllers', [])
 										}
 										// auto fit
 										else if(act == 'fit'){
-											$editorSVG.block({ 
+											$.blockUI({ 
 												message: '<i class="icon-spinner icon-spin icon-large"></i> Please wait...',
 												css: {
 													border: '1px solid #007dbc'
@@ -454,7 +567,7 @@ angular.module('ImageCreatorControllers', [])
 												for(var i in changeEl){
 													changeEl[i].setAttribute('xlink:href',response.dataURI);
 												}
-												$editorSVG.unblock();
+												$.unblockUI();
 											});
 										}
 									}
@@ -469,45 +582,71 @@ angular.module('ImageCreatorControllers', [])
 						inputFileText : 'Select an image',
 						section       : 'logo',
 						compile       : function(buttonEl, changeEl, blob, image){
-							// change text button input file
-							buttonEl.innerHTML = buttonEl.innerHTML.replace(/upload/i, 'Edit');
-							// re-compile to injecting scope
-							angular.forEach(changeEl, function(e,i){
-								var logo = {
-									parent : $(e).parent(),
-									holder : $(e).prev()[0],
-									image  : e
-								};
-								// inject logo holder (padding 20)
-								logo.holder.setAttribute('width','{{getWH()}}');
-								logo.holder.setAttribute('height','{{getHH()}}');
-								// inject logo image
-								logo.image.setAttribute('xlink:href',image.src);
-								logo.image.setAttribute('width','{{banner.logo.w}}');
-								logo.image.setAttribute('height','{{banner.logo.h}}');
-								// remove old logo image n holder
-								logo.parent.html('');
-								// append new logo image n holder with inject scope
-								logo.parent.append($compile(logo.holder)($scope));
-								logo.parent.append($compile(logo.image)($scope));
+							// change text label input file
+							var labelEl = $(buttonEl).parent().siblings('label')[0];
+
+							$.blockUI({
+								message: '<i class="icon-spinner icon-spin icon-large"></i> Please wait...',
+								css: {
+									border: '1px solid #007dbc'
+								}
 							});
-							// applying scope
-							$scope.$apply(function(scope){
-								scope.banner.logo.w = parseInt(image.width);
-								scope.banner.logo.h = parseInt(image.height);
-								// calculate image placeholder
-								scope.getWH = function() {
-									return parseInt(scope.banner.logo.w) + scope.banner.logo.margin;
-								};
-								scope.getHH = function() {
-									return parseInt(scope.banner.logo.h) + scope.banner.logo.margin;
-								};
-								// calculate aspect ratio image height
-								scope.$watch('banner.logo.w', function(input) {
-									var ratio = [input / image.width, image.height / image.height];
-									var aspectRatio = Math.min(ratio[0], ratio[1]);
-									scope.banner.logo.h = parseInt(image.height * aspectRatio);
+							// upload to resize
+							imageReader.uploadFile({
+								file: blob,
+								name: 'logo',
+								size: logoDimension.image
+							}, function(response){
+								// change image src only
+								angular.forEach(changeEl, function(e,i){
+									var logo = {
+										parent : $(e).parent(),
+										holder : $(e).prev()[0],
+										image  : e
+									};
+									// inject logo holder (padding 20)
+									// logo.holder.setAttribute('width','{{getWH()}}');
+									// logo.holder.setAttribute('height','{{getHH()}}');
+									// inject logo image
+									logo.image.setAttribute('xlink:href',response.dataURI);
+									logo.image.setAttribute('width','{{banner.logo.w}}');
+									logo.image.setAttribute('height','{{banner.logo.h}}');
+									logo.image.setAttribute('x','{{banner.logo.x}}');
+									logo.image.setAttribute('y','{{banner.logo.y}}');
+									// remove old logo image n holder
+									logo.parent.html('');
+									// append new logo image n holder with inject scope
+									// logo.parent.append($compile(logo.holder)($scope));
+									logo.parent.append(logo.holder);
+									logo.parent.append($compile(logo.image)($scope));
 								});
+								// applying scope
+								$scope.$apply(function(scope){
+									scope.banner.logo.w = logoDimension.image.width;
+									scope.banner.logo.h = logoDimension.image.height;
+									scope.banner.logo.x = logoDimension.pos.image.x;
+									scope.banner.logo.y = logoDimension.pos.image.y;
+									// calculate image position (center)
+									// calculate aspect ratio image height
+									scope.$watch('banner.logo.w', function(input) {
+										if(parseInt(input) <= logoDimension.image.width){
+											// dimension
+											var ratio = [input / logoDimension.image.width, logoDimension.image.height / logoDimension.image.height];
+											var aspectRatio = Math.min(ratio[0], ratio[1]);
+											scope.banner.logo.h = parseInt(logoDimension.image.height * aspectRatio);
+											// position
+											var dx = (logoDimension.image.width + 10) - parseInt(input);
+											var dy = (logoDimension.image.height + 10) - parseInt(scope.banner.logo.h);
+											scope.banner.logo.x = (dx <= 0) ? scope.banner.logo.x : (dx / 2) + logoDimension.pos.placeholder.x;
+											scope.banner.logo.y = (dy <= 0) ? scope.banner.logo.y : (dy / 2) + logoDimension.pos.placeholder.y;
+										}
+										else {
+											scope.banner.logo.w = logoDimension.image.width;
+											scope.banner.logo.h = logoDimension.image.height;
+										}
+									});
+								});
+								$.unblockUI();
 							});
 						}
 					});
@@ -619,7 +758,7 @@ angular.module('ImageCreatorControllers', [])
 									}
 									// auto fit
 									else if(act == 'fit'){
-										$editorSVG.block({
+										$.blockUI({
 											message: '<i class="icon-spinner icon-spin icon-large"></i> Please wait...',
 											css: {
 												border: '1px solid #007dbc'
@@ -633,7 +772,7 @@ angular.module('ImageCreatorControllers', [])
 											for(var j in changeEl){
 												changeEl[j].setAttribute('xlink:href',response.dataURI);
 											}
-											$editorSVG.unblock();
+											$.unblockUI();
 										});
 									}
 								}
