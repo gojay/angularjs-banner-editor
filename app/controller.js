@@ -894,6 +894,29 @@ angular.module('ImageCreatorControllers', [])
 			$('#templates').trigger('cancelTemplate');
 		};
 
+		$scope.hideLogo = function(event){
+			var $chHide = $(event.currentTarget);
+			$('#svg-editor > svg').each(function(i,e){
+				var $logo = $(e).find('#logo').eq(0);
+				console.log($logo);
+				if($chHide.is(":checked")){
+					$logo.hide();
+					$chHide.parents('.accordion-inner').children().each(function(x,z){
+						if(x > 0){
+							$(z).hide('slow');
+						}
+					});
+				} else {
+					$logo.show();
+					$chHide.parents('.accordion-inner').children().each(function(x,z){
+						if(x > 0){
+							$(z).show('slow');
+						}
+					});
+				}
+			});
+		};
+
 		$scope.addWhitePlaceholder = function(event){
 			var $placeholder = $(event.currentTarget);
 			var $rect = $('#svg-editor > svg > #logo > rect');
