@@ -1043,48 +1043,63 @@ angular.module('ImageCreatorControllers', [])
 		// http://documentup.com/wout/svg.js
 		// https://github.com/wout/svg.textflow.js
 		$scope.foreignToSVGXML = function(evt){
-			// var $svg = $('#svg-editor > svg').eq(0);
-			// var description   = $('#description', $svg)[0];
-			// var foreignobject = $('#description > .foreign-object', $svg)[0];
-			// var titles = $(foreignobject).find('h3').html().split(/<br[^>]*>/gi);
-			// var p = $(foreignobject).find('p').html();
+			var $svg = $('#svg-editor > svg').eq(0);
+			var description   = $('#description', $svg)[0];
+			var foreignobject = $('#description', $svg).children().last()[0];
+			console.log(foreignobject);
+			// get title html, then split into array by br tags
+			var titles = [];
+			var title = $(foreignobject).find('h3').html();
+			if(/<br[^>]*>/.test(title)) titles = title.split(/<br[^>]*>/gi);
+			else titles.push(title);
+			// get paragraph html, then replace br tags into new line
+			var p = $(foreignobject).find('p').html();
+			var paragraph = /<br[^>]*>/.test(p) ? p.replace(/<br[^>]*>/gi, '\n') : p;
 
-			// var x = parseInt(foreignobject.getAttribute('x')) + 20;
-			// var y = parseInt(foreignobject.getAttribute('y')) + 35; // 163
+			var x = parseInt(foreignobject.getAttribute('x')) + 20;
+			var y = parseInt(foreignobject.getAttribute('y')) + 35; // 163
 
-			// var svgNS = "http://www.w3.org/2000/svg";
-			// for(var i in titles) {
-			// 	var newText = document.createElementNS(svgNS,"text");
-			// 	newText.setAttributeNS(null,"x", x);
-			// 	newText.setAttributeNS(null,"y", y);
-			// 	newText.setAttributeNS(null,"font-family", "Rockwell");
-			// 	newText.setAttributeNS(null,"font-size", 27);
-			// 	newText.setAttributeNS(null,"fill", "white");
+			var svgNS = "http://www.w3.org/2000/svg";
+			for(var i in titles) {
+				var newText = document.createElementNS(svgNS,"text");
+				newText.setAttributeNS(null,"x", x);
+				newText.setAttributeNS(null,"y", y);
+				newText.setAttributeNS(null,"font-family", "Rockwell");
+				newText.setAttributeNS(null,"font-size", 27);
+				newText.setAttributeNS(null,"fill", "white");
 
-			// 	var textNode = document.createTextNode(titles[i]);
-			// 	newText.appendChild(textNode);
-			// 	description.appendChild(newText);
+				var textNode = document.createTextNode(titles[i]);
+				newText.appendChild(textNode);
+				description.appendChild(newText);
 
-			// 	y += 32;
-			// }
-
-			// var draw = SVG('canvas');
-			// var flow = draw.textflow(p).size(364);
-			// flow.font({ family: 'Arial', size: 12 });
-			// flow.fill('white');
-			// flow.attr('x', x);
-			// flow.attr('y', 245);
-
-			// var canvas = $('#canvas svg')[0];
-			// console.log(canvas);
-			// description.appendChild(canvas);
-
-			// $(foreignobject).remove();
+				y += 32;
+			}
+			// create svg dummy for replacing description foreign object
+			var svg   = SVG('canvas');
+			var tDesc = svg.textflow(paragraph).size(364);
+			tDesc.font({ family: 'Arial', size: 12 });
+			tDesc.attr({
+				fill:'white',
+				x:x,
+				y:245
+			});
+			// increament el tspan attr dy (2px), not in first child
+			$('#'+tDesc.node.id).children().each(function(i,e){
+				if(i === 0) return;
+				var dy = parseFloat(e.getAttribute('dy'));
+				e.setAttribute('dy', parseFloat(dy + 2.0));
+			});
+			// get svg
+			var canvas = $('#canvas svg')[0];
+			// append to description
+			description.appendChild(canvas);
+			// remove old description
+			$(foreignobject).remove();
 			
 			// http://updates.html5rocks.com/2011/08/Saving-generated-files-on-the-client-side
 			// http://www.html5rocks.com/en/tutorials/file/filesystem/#toc-file-writing
-			var svg = $('#svg-editor > svg')[0];
-			var svg_xml = (new XMLSerializer()).serializeToString(svg);
+			// var svg = $('#svg-editor > svg').eq(0)[0];
+			// var svg_xml = (new XMLSerializer()).serializeToString(svg);
 
 			// var bb = new BlobBuilder();
 			// bb.append(svg_xml);
@@ -1113,16 +1128,16 @@ angular.module('ImageCreatorControllers', [])
 
 			// 	$('body').append(canvas.outerHTML);
 
-			var file = dataURItoBlob("data:image/svg+xml;base64," + btoa(svg_xml));
-			console.log(file);
-			var url = window.URL.createObjectURL(file);
-			var img2 = new Image();
-			img2.onload = function(){
-				// Clean up after
-				window.URL.revokeObjectURL(url);
-			};
-			img2.src = url;
-			$('body').append(img2.outerHTML);
+			// var file = dataURItoBlob("data:image/svg+xml;base64," + btoa(svg_xml));
+			// console.log(file);
+			// var url = window.URL.createObjectURL(file);
+			// var img2 = new Image();
+			// img2.onload = function(){
+			// 	// Clean up after
+			// 	window.URL.revokeObjectURL(url);
+			// };
+			// img2.src = url;
+			// $('body').append(img2.outerHTML);
 
 			// 	// var fd = new FormData();
 			// 	// fd.append('file', file);

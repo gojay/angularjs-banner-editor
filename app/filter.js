@@ -7,16 +7,16 @@
  angular.module('ImageCreatorFilters', [])
 	.filter('comaToNewLine', function() {
 		return function(input) {
-			return input.replace(/,/g, '<div style="clear:both; margin-top:5px;"></div>');
+			return input.replace(/,/g, '<br>');
 		};
 	})
 	.filter('newLineToBr', function() {
 		return function(input) {
-			return input.replace(/\n/g, '<div style="clear:both; margin-top:5px;"></div>');
+			return input.replace(/\n/g, '<br>');
 		};
 	})
 	.filter('newLineToDblBr', function() {
 		return function(input) {
-			return input.replace(/\n/g, '<div style="clear:both; margin-top:5px;"></div><div style="clear:both; margin-top:5px;"></div>');
+			return input.replace(/\n/g, '<br><br>');
 		};
 	});
