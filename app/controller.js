@@ -35,17 +35,17 @@ angular.module('ImageCreatorControllers', [])
 			},
 			price : {
 				one: {
-					text   : 'Enter price 1 description',
+					text   : 'Enter prize 1 description',
 					limit  : 75,
 					counter: 75
 				},
 				two: {
-					text    : 'Enter price 2 description',
+					text    : 'Enter prize 2 description',
 					limit   : 75,
 					counter : 75
 				},
 				three: {
-					text    : 'Enter price 3 description',
+					text    : 'Enter prize 3 description',
 					limit   : 75,
 					counter : 75
 				}
@@ -1047,17 +1047,23 @@ angular.module('ImageCreatorControllers', [])
 			var description   = $('#description', $svg)[0];
 			var foreignobject = $('#description', $svg).children().last()[0];
 			console.log(foreignobject);
-			// get title html, then split into array by br tags
-			var titles = [];
-			var title = $(foreignobject).find('h3').html();
-			if(/<br[^>]*>/.test(title)) titles = title.split(/<br[^>]*>/gi);
-			else titles.push(title);
-			// get paragraph html, then replace br tags into new line
-			var p = $(foreignobject).find('p').html();
-			var paragraph = /<br[^>]*>/.test(p) ? p.replace(/<br[^>]*>/gi, '\n') : p;
-
+			console.log(foreignobject.getAttribute('width'));
+			// calc x, y position
 			var x = parseInt(foreignobject.getAttribute('x')) + 20;
 			var y = parseInt(foreignobject.getAttribute('y')) + 35; // 163
+			// get title html, then split into array by br tags
+			var titles = [];
+			var $title    = $(foreignobject).find('h3');
+			var tFontSize = parseInt($title.css('font-size').replace(/\px/, ''));
+			var tHTML     = $title.html();
+			var tLineH    = parseInt(tFontSize * 1.2);
+			if(/<br[^>]*>/.test(tHTML)) titles = tHTML.split(/<br[^>]*>/gi);
+			else titles.push(tHTML);
+			// get paragraph html, then replace br tags into new line
+			var $p        = $(foreignobject).find('p');
+			var pHTML     = $p.html();
+			var pFontSize = parseInt($p.css('font-size').replace(/\px/, ''));
+			var paragraph = /<br[^>]*>/.test(pHTML) ? pHTML.replace(/<br[^>]*>/gi, '\n') : pHTML ;
 
 			var svgNS = "http://www.w3.org/2000/svg";
 			for(var i in titles) {
@@ -1065,19 +1071,20 @@ angular.module('ImageCreatorControllers', [])
 				newText.setAttributeNS(null,"x", x);
 				newText.setAttributeNS(null,"y", y);
 				newText.setAttributeNS(null,"font-family", "Rockwell");
-				newText.setAttributeNS(null,"font-size", 27);
+				newText.setAttributeNS(null,"font-size", tFontSize);
 				newText.setAttributeNS(null,"fill", "white");
 
 				var textNode = document.createTextNode(titles[i]);
 				newText.appendChild(textNode);
 				description.appendChild(newText);
 
-				y += 32;
+				y += tLineH;
 			}
 			// create svg dummy for replacing description foreign object
-			var svg   = SVG('canvas');
-			var tDesc = svg.textflow(paragraph).size(364);
-			tDesc.font({ family: 'Arial', size: 12 });
+			var svg    = SVG('canvas');
+			var tWidth = parseInt(foreignobject.getAttribute('width')) - 40;
+			var tDesc  = svg.textflow(paragraph).size(tWidth);
+			tDesc.font({ family: 'Arial', size: pFontSize });
 			tDesc.attr({
 				fill:'white',
 				x:x,
