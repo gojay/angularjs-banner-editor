@@ -947,7 +947,7 @@ angular.module('ImageCreatorControllers', [])
 				var imgDataURI = canvas.toDataURL('image/jpg');
 				callback(img, imgDataURI);
 			};
-			img.src = "data:image/svg+xml;base64," + btoa(svg_xml);
+			img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent( svg_xml )));
 		}
 
 		// SVG to dataURI
