@@ -47,6 +47,17 @@ angular.module('ImageCreatorApp', ['ImageCreatorProvider', 'ImageCreatorControll
 						}
 					}
 				})
+				.when('/splash', {
+					templateUrl : 'partials/splash.html',
+					controller  : 'SplashController',
+					resolve: {
+						delay: function($q, $timeout) {
+							var delay = $q.defer();
+							$timeout(delay.resolve, 1000);
+							return delay.promise;
+						}
+					}
+				})
 				.otherwise({ redirectTo:'/' });
 
 			// $locationProvider.html5Mode(true);

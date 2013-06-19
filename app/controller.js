@@ -185,7 +185,7 @@ angular.module('ImageCreatorControllers', [])
 							y:5
 						},
 						image:{
-							x:25,
+							x:45,
 							y:10
 						}
 					},
@@ -404,7 +404,7 @@ angular.module('ImageCreatorControllers', [])
 			}
 
 			// compile SVG (inject scope)
-			var tplIndex = tplDimension.match(/(\d)/)[0] - 1;
+			var tplIndex = tplDimension.match(/(\d)/)[0];
 			var $svg = getSVGCompiled($tplContent, 'like', tplIndex);
 			var $svg2 = getSVGCompiled($tplContent, 'enter', tplIndex);
 			$tpl.hide(400, function(){
@@ -597,6 +597,7 @@ angular.module('ImageCreatorControllers', [])
 								name: 'logo',
 								size: logoDimension.image
 							}, function(response){
+								console.log('logoDimension', logoDimension);
 								// change image src only
 								angular.forEach(changeEl, function(e,i){
 									var logo = {
@@ -620,12 +621,14 @@ angular.module('ImageCreatorControllers', [])
 									logo.parent.append(logo.holder);
 									logo.parent.append($compile(logo.image)($scope));
 								});
+
 								// applying scope
 								$scope.$apply(function(scope){
 									scope.banner.logo.w = logoDimension.image.width;
 									scope.banner.logo.h = logoDimension.image.height;
 									scope.banner.logo.x = logoDimension.pos.image.x;
 									scope.banner.logo.y = logoDimension.pos.image.y;
+									console.log('scope', scope);
 									// calculate image position (center)
 									// calculate aspect ratio image height
 									scope.$watch('banner.logo.w', function(input) {
@@ -637,7 +640,8 @@ angular.module('ImageCreatorControllers', [])
 											// position
 											var dx = (logoDimension.image.width + 10) - parseInt(input);
 											var dy = (logoDimension.image.height + 10) - parseInt(scope.banner.logo.h);
-											scope.banner.logo.x = (dx <= 0) ? scope.banner.logo.x : (dx / 2) + logoDimension.pos.placeholder.x;
+											var x = (dx <= 0) ? scope.banner.logo.x : (dx / 2) + logoDimension.pos.placeholder.x;
+											scope.banner.logo.x = (tplIndex == 3) ? x + 20 : x ;
 											scope.banner.logo.y = (dy <= 0) ? scope.banner.logo.y : (dy / 2) + logoDimension.pos.placeholder.y;
 										}
 										else {
@@ -734,10 +738,10 @@ angular.module('ImageCreatorControllers', [])
 								onUnblock: function() {
 									$tempImg.remove();
 									$('#crop-wrapper').remove();
+									// change the button text to 'Edit'
+									labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
 									// crop
 									if(act == 'crop'){
-										// change the button text to 'Edit'
-										labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
 										// change image src, dimension n position
 										for(var i in changeEl){
 											changeEl[i].setAttribute('xlink:href',image.src);
@@ -749,8 +753,6 @@ angular.module('ImageCreatorControllers', [])
 									}
 									// ascpect ratio
 									else if(act == 'ratio'){
-										// change the button text to 'Edit'
-										labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
 										// change image src only
 										for(var j in changeEl){
 											changeEl[j].setAttribute('xlink:href',image.src);
@@ -823,14 +825,19 @@ angular.module('ImageCreatorControllers', [])
 				});
 			});
 			$('#background', $svg).children().map(function(i,e){
-				if($(e).attr('fill')) {
+				if($(e).attr('id') !== undefined && $(e).attr('fill') !== undefined) {
 					$(e).attr('fill', function(index, id){
 						return id.replace(/(\d+)/, function(fullMatch, n) {
 							return 'editor-'+type;
 						});
 					});
 				}
-				else {
+				else if(i == 1) {
+					if(type == 'enter') {
+						$(e).remove();
+						return;
+					}
+
 					e.setAttribute('width', '{{banner.fb.w}}');
 					e.setAttribute('height', '{{banner.fb.h}}');
 					e.setAttribute('x', '{{getX()}}');
@@ -845,10 +852,10 @@ angular.module('ImageCreatorControllers', [])
 						$scope.banner.fb.h = parseInt(67 * aspectRatio);
 					});
 					$scope.getX = function(){
-						return 810 - $scope.banner.fb.w;
+						var calc = 810 - $scope.banner.fb.w;
+						return tplIndex == 3 ? calc - 20 : calc ;
 					}
 				}
-				if(i == 1 && type == 'enter') $(e).remove();
 			});
 			$('#logo', $svg).children().map(function(i,e){
 				if($(e).attr('id') !== undefined) {
@@ -876,7 +883,7 @@ angular.module('ImageCreatorControllers', [])
 					if(type == 'enter') {
 						var x = [586,542,345,96,168,198];
 						$('#price > text > tspan', $svg).text('Enter to Win!');
-						$('#price > text > tspan', $svg).attr('x', x[tplIndex]);
+						$('#price > text > tspan', $svg).attr('x', x[tplIndex-1]);
 					}
 					$(e).attr('id', function(index, id){
 						return id.replace(/(\d+)/, function(fullMatch, n) {
@@ -1201,4 +1208,298 @@ angular.module('ImageCreatorControllers', [])
 		// set title n enable content
 		Page.setTitle('| Feed');
 		Page.isContent = true;
+	})
+	.controller('SplashController', function($scope, $compile, Page, transition, imageReader){
+		Page.setTitle('| Splash');
+		Page.isContent = true;
+
+		$scope.splash = {
+			editor: {
+				logo : {
+					w:null,
+					h:null,
+					x:null,
+					y:null
+				},
+				ch : {
+					x:null,
+					y:null
+				}
+			},
+			logo: {
+				iphone4: {
+					width  : 447,
+					height : 220,
+					x:97,
+					y:120
+				},
+				iphone5: {
+					width  : 447,
+					height : 220,
+					x:97,
+					y:164
+				},
+				ipad: {
+					width  : 1009,
+					height : 354,
+					x:257,
+					y:422
+				}
+			},
+			ch: {
+				iphone4: {
+					x : 167,
+					y : 608
+				},
+				iphone5: {
+					x : 167,
+					y : 745
+				},
+				ipad: {
+					x : 405,
+					y : 1043
+				}
+			}
+		};
+
+		$scope.doSetting = function($event){
+			var $btnTemplate = $($event.currentTarget);
+			var $btnCancel       = $btnTemplate.next();
+			var $templateField   = $btnTemplate.siblings('#templates');
+			var $settingField    = $btnTemplate.siblings('#settings');
+			var $contentField    = $('#splash-editor .tab-content');
+			var $svgEditor       = $('#svg-editor');
+			var $liActive        = $('ul > li.active > a', $templateField);
+			var tplShowSplash    = $scope.tplShowSplash = $liActive.data('splash');
+			
+			var settings = {
+				field : {
+					template   : $templateField,
+					setting    : $settingField,
+					content    : $contentField
+				},
+				btn: {
+					template : $btnTemplate,
+					cancel   : $btnCancel
+				},
+				editor : {
+					svg : $svgEditor
+				},
+				attributes : {
+					tplShowSplash : tplShowSplash
+				}
+			};
+
+			// alert overwrite
+			if($btnTemplate.hasClass('overwrite')){
+				$('#popup-overwrite').bind('overwrite', function(){
+					var self = this;
+					$('.blockOverlay').click();
+					bannerSetting(settings, true);
+				});
+				// show message
+				$.blockUI({
+					message: $('#popup-overwrite'),
+					css: {
+						background : 'transparent',
+						border     : 'none',
+						top        : ($(window).height() - 479) / 2 + 'px',
+						left       : ($(window).width() - 649) / 2 + 'px',
+						width      : '649px'
+					}
+				});
+				$('.blockOverlay').attr('title','Click to cancel').click($.unblockUI);
+				return;
+			}
+			// return to the templates
+			if($templateField.is(':hidden')){
+				$templateField.show(400, function(){
+					$btnCancel.show();
+					$btnTemplate.addClass('overwrite').html('<i class="icon-cog"></i> Settings');
+					$contentField.show();
+					$settingField.hide();
+					$svgEditor.hide();
+				});
+				return;
+			}
+			bannerSetting(settings, false);
+		};
+
+		$scope.overwiriteTplYes = function(evt){
+			$('#popup-overwrite').trigger('overwrite');
+		};
+		$scope.overwiriteTplNo = function(evt){
+			$('.blockOverlay').click();
+			$('#templates').trigger('cancelTemplate');
+		};
+
+		var bannerSetting = function( options, overwrite ){
+			var $tpl          = options.field.template;
+			var $settingField = options.field.setting;
+			var $tplContent   = options.field.content;
+			var $btnTemplate  = options.btn.template;
+			var $btnCancel    = options.btn.cancel;
+			var $editorSVG    = options.editor.svg;
+			var tplShowSplash = options.attributes.tplShowSplash;
+
+			console.log('settings', options);
+			// tooltip
+			$('a').tooltip();
+
+			if( overwrite ){
+				// remove class overwrite
+				$btnTemplate.removeClass('overwrite');
+				// clear all setting input file
+				$('input[type="file"]', $settingField).each(function(e,i){
+					$(this).val('');
+				});
+			}
+
+			// canvas dimensions
+			var logoDimension = $scope.splash.logo[tplShowSplash];
+			var chDimension   = $scope.splash.ch[tplShowSplash];
+
+			console.log('logoDimension', tplShowSplash, logoDimension);
+
+			// compile SVG (inject scope)
+			var $svg = getSVGCompiled($tplContent, 'splash', chDimension);
+			$tpl.hide(400, function(){
+				$(this).hide();
+				$tplContent.hide();
+				$btnCancel.hide();
+				$btnTemplate.html('<i class="icon-list"></i> Choose Template');
+
+				$settingField.show(400,function(){
+					// clear editor
+					$editorSVG.html('');
+					// append svg
+					$editorSVG.append($svg);
+					// create input hidden to set canvas dimensions
+					// will be used to image conversion
+					// var inputCanvas = document.createElement("input");
+					// inputCanvas.setAttribute("type", "hidden");
+					// inputCanvas.setAttribute("name", "canvasDimensions");
+					// inputCanvas.setAttribute("value", JSON.stringify(logoDimension));
+					// append canvas
+					// $editorSVG.append(inputCanvas);
+
+					// show editor
+					if($editorSVG.is(':hidden')) $editorSVG.show();
+					
+					// input color picker
+					$('#input-background-color').jPicker({
+						window : {
+							effects :  { type: 'fade' },
+							position : {
+								x : 'screenCenter',
+								y : 'center'
+							}
+						},
+						images : {
+							clientPath : 'assets/css/jpicker/images/'
+						}
+					}, function(color, context) {
+			          	var all = color.val('all');
+			          	if( all.hex == 'ffffff' ){
+			          		$('rect', $svg)[0].setAttribute('stroke', 'black');
+			          		$('#logo-footer-color', $svg).hide();
+			          		$('#logo-footer-white', $svg).show();
+			          	} else {
+			          		$('rect', $svg)[0].setAttribute('stroke', 'transparent');
+			          		$('#logo-footer-color', $svg).show();
+			          		$('#logo-footer-white', $svg).hide();
+			          	}
+			        	$('rect', $svg)[0].setAttribute('fill', '#' + all.hex);
+			        }, function(color, context) {
+			          	var all = color.val('all');
+			          	if( all.hex === 'ffffff' ){
+			          		$('#logo-footer-color', $svg).hide();
+			          		$('#logo-footer-white', $svg).show();
+			          	} else {
+			          		$('#logo-footer-color', $svg).show();
+			          		$('#logo-footer-white', $svg).hide();
+			          	}
+			        	$('rect', $svg)[0].setAttribute('fill', '#' + all.hex);
+			        });
+
+					/* initialize image reader */
+					
+					// logo
+					imageReader.init({
+						dropArea      : '#drop-logo',
+						inputFileEl   : '#input-logo',
+						inputFileText : 'Select an image',
+						section       : 'splash',
+						compile       : function(buttonEl, changeEl, blob, image){
+							// change text label input file
+							var labelEl = $(buttonEl).parent().siblings('label')[0];
+							labelEl.innerHTML = labelEl.innerHTML.replace(/upload/i, 'Edit');
+
+							console.log('changeEl', changeEl);
+
+							$.blockUI({
+								message: '<i class="icon-spinner icon-spin icon-large"></i> Please wait...',
+								css: {
+									border: '1px solid #007dbc'
+								}
+							});
+							// upload to resize
+							imageReader.uploadFile({
+								file: blob,
+								name: 'splash',
+								size: logoDimension
+							}, function(response){
+								console.log(response);
+								var $parent = $(changeEl).parent();
+								// change image src only
+								changeEl.setAttribute('xlink:href', response.dataURI);
+								changeEl.setAttribute('width','{{splash.editor.logo.w}}');
+								changeEl.setAttribute('height','{{splash.editor.logo.h}}');
+								changeEl.setAttribute('x','{{splash.editor.logo.x}}');
+								changeEl.setAttribute('y','{{splash.editor.logo.y}}');
+								// remove old image logo
+								$('image', $parent).eq(0).remove();
+								// then prepend new compiled image logo
+								$parent.append($compile(changeEl)($scope));
+								// applying scope
+								$scope.$apply(function(scope){
+									scope.splash.editor.logo.w = logoDimension.width;
+									scope.splash.editor.logo.h = logoDimension.height;
+									scope.splash.editor.logo.x = logoDimension.x;
+									scope.splash.editor.logo.y = logoDimension.y;
+									// watchers, update y logo horizontal
+									scope.$watch('splash.editor.logo.y', function(input){
+										scope.splash.editor.logo.y = input;
+									});
+								});
+								$.unblockUI();
+							});
+						}
+					});
+				});
+			});
+		}
+
+		var getSVGCompiled = function ($tplContent, type, chDimension){
+			var $svg = $('.active > svg', $tplContent).clone();
+			$svg.attr('id', 'svg-editor-'+type);
+			
+			$('#logo', $svg).children().map(function(i,e){
+				if($(e).attr('id') !== undefined) {
+					$(e).attr('id', function(index, id){
+						return id.replace(/(\d+)/, function(fullMatch, n) {
+							return 'editor-'+type;
+						});
+					});
+					if(i > 0) e.setAttribute('y', '{{splash.editor.ch.y}}');
+				}
+			});
+
+			$scope.splash.editor.ch.y = chDimension.y;
+			$scope.$watch('splash.editor.ch.y', function(input){
+				$scope.splash.editor.ch.y = input;
+			});
+
+			return $compile($svg)($scope);
+		};
 	});

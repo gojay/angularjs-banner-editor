@@ -1,0 +1,22 @@
+<aside class="span3 prefix tabbable tabs-left">
+	<div id="templates">
+		<h5>Default Templates</h5>
+		<div class="tabbable tabs-left">
+			<ul class="nav nav-tabs span12">
+				<li class="active"><a href="#svg-iphone-4" data-toggle="tab" data-splash="iphone4">IPone 4</a></li>
+				<li><a href="#svg-iphone-5" data-toggle="tab" data-splash="iphone5">IPone 5</a></li>
+				<!-- <li><a href="#svg-ipad" data-toggle="tab" data-splash="ipad">IPad</a></li> -->
+			</ul>
+		</div>
+	</div>
+	<button class="btn btn-primary btn-block" ng-click="doSetting($event)"><i class="icon-cog"></i> Settings</button>
+	<!-- <button class="btn btn-block" ng-click="foreignToSVGXML()" style="display: block !important">Parse HTML</button> -->
+	<button id="cancelTpl" class="btn btn-block hide" ng-click="cancelTemplate($event)">Cancel</button>
+	<div id="settings" class="hide margin-top-bottom">
+		<div ng-include src="'partials/splash-setting.html'"></div>
+	</div>
+</aside>
+<section class="span9" style="position: relative">
+	<splash-creator splash="splash"></splash-creator>
+</section>
+<div ng-include src="'partials/popup.html'"></div>

@@ -165,6 +165,9 @@ angular.module('ImageCreatorProvider', [])
 								enter : $svg_enter.find('#price-image-editor-enter-3 > image')[0]
 							};
 							break;
+						case 'splash':
+							options.changeEl = $svg_like.find('#logo > image').eq(0)[0];
+							break;
 					}
 
 					var defaults = {
@@ -217,7 +220,7 @@ angular.module('ImageCreatorProvider', [])
 						self.handleReadImage(file, config);
 					});
 
-					/* drag n drop events */
+					/* drag n drop events
 
 					$(config.dropArea)
 						// event drop 
@@ -254,7 +257,7 @@ angular.module('ImageCreatorProvider', [])
 							if ($(this).find(evt.target).length) {
 								$(config.dropArea).removeClass('over');
 							}
-						});
+						}); */
 				},
 
 				handleReadImage: function(file, config){
