@@ -117,6 +117,7 @@ angular.module('ImageCreatorProvider', [])
 						setTimeout(function() {
 							if( self.isPerspective() ){
 								$page.css('height', '100%');
+								$page.removeClass(classIn);
 							}
 						}, 1000);
 

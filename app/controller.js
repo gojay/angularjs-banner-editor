@@ -564,6 +564,8 @@ angular.module('ImageCreatorControllers', [])
 												name: 'background',
 												size: backgroundDimension
 											}, function(response){
+												console.log('response', response);
+												console.log('changeEl', changeEl);
 												for(var i in changeEl){
 													changeEl[i].setAttribute('xlink:href',response.dataURI);
 												}
@@ -825,7 +827,7 @@ angular.module('ImageCreatorControllers', [])
 				});
 			});
 			$('#background', $svg).children().map(function(i,e){
-				if($(e).attr('id') !== undefined && $(e).attr('fill') !== undefined) {
+				if($(e).attr('fill') !== undefined) {
 					$(e).attr('fill', function(index, id){
 						return id.replace(/(\d+)/, function(fullMatch, n) {
 							return 'editor-'+type;
