@@ -10,9 +10,9 @@
 			    <div id="background" class="accordion-body collapse in">
 			      	<div class="accordion-inner">
 			        	<div class="control-group">
-							<label class="control-label" style="margin-left:0; text-align:left;">Select Color</label>
+							<label class="control-label" style="width: 100%; margin-left:0; text-align:left;">Select Color</label>
 							<div class="controls" style="margin-left:0;">
-								<input id="input-background-color" class="input-small" value="ffffff" />
+								<input id="input-background-color" class="input-small" value="ffffff" style="border: 1px solid rgba(0, 0, 0, 0.3); padding:3px;" />
 							</div>
 						</div>
 			      	</div>
@@ -44,17 +44,17 @@
 			    <div id="reposition" class="accordion-body collapse">
 			      	<div class="accordion-inner">
 						<div class="control-group">
-							<label class="control-label" style="width: 100px; text-align:left;">Logo</label>
-							<div class="controls" style="margin-left: 100px;">
-								<input type="number" id="input-reposition-logo" class="input-small" ng-disabled="!splash.editor.logo.y" ng-model="splash.editor.logo.y" />
-							</div>
-						</div>
-						<div class="control-group">
-							<label class="control-label" style="width: 100px; text-align:left;">Footer</label>
-							<div class="controls" style="margin-left: 100px;">
-								<input type="number" id="input-reposition-footer" class="input-small" ng-model="splash.editor.ch.y" />
-							</div>
-						</div>
+				      		<div class="span6">
+				      			<label style="text-align:center;">Logo</label>
+				      			<div id="slider-vertical-header" style="height: 200px; left: 50%;"></div>
+								<input type="number" id="input-reposition-header" ng-disabled="!splash.editor.logo.y" ng-model="splash.editor.logo.y" style="margin-left:50px; margin-top:20px; width:30px" />
+				      		</div>
+				      		<div class="span6 prefix">
+				      			<label style="text-align:center;">Copyright</label>
+				      			<div id="slider-vertical-footer" style="height: 200px; left: 50%;"></div>
+				      			<input type="number" id="input-reposition-footer" ng-model="splash.editor.ch.y" style="margin-left:50px; margin-top:20px; width:30px" />
+				      		</div>
+			      		</div>
 			      	</div>
 			    </div>
 			</div>

@@ -426,3 +426,13 @@ input#spinner {
 	min-height: 350px;
 	margin:20px 0;
 }
+
+.jPicker.Container {
+	position: fixed !important;
+}
+
+.splash-wrapper {
+	text-align: center;
+	padding-top: 5px; 
+	background-color: #eeeeee;
+}

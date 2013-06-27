@@ -1215,6 +1215,14 @@ angular.module('ImageCreatorControllers', [])
 		Page.setTitle('| Splash');
 		Page.isContent = true;
 
+		$(window).scroll(function(){
+			if ($(window).scrollTop() > 100) {
+		        $('aside').css('top', 10);
+		    } else {
+		    	 $('aside').css('top', 100);
+		    }
+		});
+
 		$scope.splash = {
 			editor: {
 				logo : {
@@ -1226,6 +1234,20 @@ angular.module('ImageCreatorControllers', [])
 				ch : {
 					x:null,
 					y:null
+				}
+			},
+			dimensions: {
+				iphone4: {
+					width  : 640,
+					height : 920
+				},
+				iphone5: {
+					width  : 640,
+					height : 1096
+				},
+				ipad: {
+					width  : 1536,
+					height : 2048
 				}
 			},
 			logo: {
@@ -1264,6 +1286,20 @@ angular.module('ImageCreatorControllers', [])
 			}
 		};
 
+		var splashType = null;
+
+		$('#templates').bind('cancelTemplate', function(e){
+			$(this).fadeOut(400, function(){
+				$(this).hide();
+				$('.tab-content').hide();
+				$(this).next().removeClass('overwrite');
+				$(this).siblings('#cancelTpl').hide();
+				$(this).siblings('#settings').show();
+				$('#svg-editor').show();
+			});
+		});
+
+
 		$scope.doSetting = function($event){
 			var $btnTemplate = $($event.currentTarget);
 			var $btnCancel       = $btnTemplate.next();
@@ -1273,6 +1309,8 @@ angular.module('ImageCreatorControllers', [])
 			var $svgEditor       = $('#svg-editor');
 			var $liActive        = $('ul > li.active > a', $templateField);
 			var tplShowSplash    = $scope.tplShowSplash = $liActive.data('splash');
+
+			splashType = tplShowSplash;
 			
 			var settings = {
 				field : {
@@ -1297,6 +1335,8 @@ angular.module('ImageCreatorControllers', [])
 				$('#popup-overwrite').bind('overwrite', function(){
 					var self = this;
 					$('.blockOverlay').click();
+					$('span.jPicker').remove();
+					$.jPicker.List[0].color.active.val('ahex', 'FFFFFFFF'); //last 2 are alpha
 					bannerSetting(settings, true);
 				});
 				// show message
@@ -1325,6 +1365,10 @@ angular.module('ImageCreatorControllers', [])
 				return;
 			}
 			bannerSetting(settings, false);
+		};
+
+		$scope.cancelTemplate = function($event){
+			$('#templates').trigger('cancelTemplate');
 		};
 
 		$scope.overwiriteTplYes = function(evt){
@@ -1472,6 +1516,20 @@ angular.module('ImageCreatorControllers', [])
 									// watchers, update y logo horizontal
 									scope.$watch('splash.editor.logo.y', function(input){
 										scope.splash.editor.logo.y = input;
+										$("#slider-vertical-header").slider( "option", "value", (h - input) );
+									});
+									var h = $scope.splash.dimensions[splashType].height;
+									$("#slider-vertical-header").slider({
+										orientation: "vertical",
+										min: 0,
+										max: h,
+										value: (h - logoDimension.y),
+										slide: function( event, ui ) {
+											var y = h - ui.value;
+											$scope.$apply(function(scope){
+												scope.splash.editor.logo.y = y;
+											});
+										}
 									});
 								});
 								$.unblockUI();
@@ -1497,11 +1555,109 @@ angular.module('ImageCreatorControllers', [])
 				}
 			});
 
+			var h = $scope.splash.dimensions[splashType].height;
+
 			$scope.splash.editor.ch.y = chDimension.y;
 			$scope.$watch('splash.editor.ch.y', function(input){
 				$scope.splash.editor.ch.y = input;
+				$("#slider-vertical-footer").slider( "option", "value", (h - input) );
+			});
+
+			$("#slider-vertical-header").slider({
+				orientation: "vertical",
+				min: 0,
+				max: 0,
+				value: 0
+			});
+
+			$("#slider-vertical-footer").slider({
+				orientation: "vertical",
+				min: 0,
+				max: h,
+				value: (h - chDimension.y),
+				slide: function( event, ui ) {
+					var y = h - ui.value;
+					console.log(y);
+					$scope.$apply(function(scope){
+						scope.splash.editor.ch.y = y;
+					});
+				}
 			});
 
 			return $compile($svg)($scope);
 		};
+
+		// SVG to dataURI
+		$scope.convert = function(evt){
+			$.blockUI({
+				message: $('#popup-loading-img'),
+				overlayCSS:{
+					opacity : '0.8'
+				},
+				css: {
+					background : 'transparent',
+					border     : 'none',
+					top        : ($(window).height() - 350) / 2 + 'px',
+					left       : ($(window).width() - 375) / 2 + 'px',
+					width      : '350px'
+				}
+			});
+
+			var svg  = $('#svg-editor > svg')[0];
+			// create canvas banner like
+			createCanvas(svg, function(img, imgDataURI){
+				// create download anchor
+				var downloadLink       = document.createElement('a');
+				downloadLink.title     = 'Download '+ splashType +' splash screen';
+				downloadLink.href      = imgDataURI;
+				downloadLink.target    = '_blank';
+				downloadLink.className = 'btn btn-success';
+				downloadLink.innerHTML = '<i class="icon-download-alt"></i> Download';
+				downloadLink.download  = 'splash-'+ splashType +'.jpg';
+				// set image class
+				img.className  = 'span12';
+				// define generate element
+				var $generate = $('#popup-result-generate-image-modal');
+				var $generateBody = $generate.find('.modal-body');
+				// create template banner list
+				var tplImages = '<li class="span12 banner-like">' +
+									'<div class="thumbnail">' + img.outerHTML +
+										'<div class="caption">' +
+											'<h3>Splash Screen</h3>' +
+											'<p>This is preview splash scrren for '+ splashType +'</p>'+
+											'<p>'+ downloadLink.outerHTML +'</p>' +
+										'</div>' +
+									'</div>' +
+								'</li>';
+				// append banner images
+				$generateBody.find('ul').html('');
+				$generateBody.find('ul').append(tplImages);
+				// open popup
+				setTimeout(function() {
+					$.unblockUI({
+						onUnblock: function() {
+							$generate.modal('show');
+							$('.download-zip', $generate).hide();
+						}
+					});
+				}, 1000);
+			});
+		};
+
+		// create canvas to generate image
+		function createCanvas(svg, callback){
+			var svg_xml = (new XMLSerializer()).serializeToString(svg);
+			var canvas  = document.createElement('canvas');
+			// get canvas context
+			var ctx = canvas.getContext("2d");
+			var img = new Image();
+			img.onload = function(){
+				canvas.width  = img.width;
+				canvas.height = img.height;
+				ctx.drawImage(img, 0, 0);
+				var imgDataURI = canvas.toDataURL('image/jpg');
+				callback(img, imgDataURI);
+			};
+			img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent( svg_xml )));
+		}
 	});

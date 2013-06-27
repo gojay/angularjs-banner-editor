@@ -531,11 +531,7 @@ angular.module('ImageCreatorComponents', [])
 			restrict: 'EAC', // E = Element, A = Attribute, C = Class, M = Comment
 			templateUrl: 'partials/components/splash-creator.html',
 			replace: true,
-			controller: function($scope, $element, $attrs, $transclude) {
-
-			},
-			link: function($scope, iElm, iAttrs, controller) {
-				
-			}
+			controller: function($scope, $element, $attrs, $transclude) { },
+			link: function($scope, iElm, iAttrs, controller) { }
 		};
 	});
