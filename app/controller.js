@@ -1418,16 +1418,9 @@ angular.module('ImageCreatorControllers', [])
 				$settingField.show(400,function(){
 					// clear editor
 					$editorSVG.html('');
+
 					// append svg
 					$editorSVG.append($svg);
-					// create input hidden to set canvas dimensions
-					// will be used to image conversion
-					// var inputCanvas = document.createElement("input");
-					// inputCanvas.setAttribute("type", "hidden");
-					// inputCanvas.setAttribute("name", "canvasDimensions");
-					// inputCanvas.setAttribute("value", JSON.stringify(logoDimension));
-					// append canvas
-					// $editorSVG.append(inputCanvas);
 
 					// show editor
 					if($editorSVG.is(':hidden')) $editorSVG.show();
@@ -1518,6 +1511,7 @@ angular.module('ImageCreatorControllers', [])
 										scope.splash.editor.logo.y = input;
 										$("#slider-vertical-header").slider( "option", "value", (h - input) );
 									});
+									// slider
 									var h = $scope.splash.dimensions[splashType].height;
 									$("#slider-vertical-header").slider({
 										orientation: "vertical",
