@@ -34,6 +34,7 @@ angular.module('ImageCreatorControllers', [])
 				margin : 0
 			},
 			price : {
+				title: 'This Month\'s Prizes',
 				one: {
 					text   : 'Enter prize 1 description',
 					limit  : 75,
@@ -68,6 +69,9 @@ angular.module('ImageCreatorControllers', [])
 				$scope.banner.description.limit = 0;
 				$scope.banner.description.text = $scope.banner.description.text.substring(0, $scope.banner.description.text.counter);
 			}
+		});
+		$scope.$watch('banner.price.title', function(input){
+			$scope.banner.price.title = input;
 		});
 		$scope.$watch('banner.price.one.text', function(input){
 			$scope.banner.price.one.counter = $scope.banner.price.one.limit - input.length;
@@ -882,10 +886,16 @@ angular.module('ImageCreatorControllers', [])
 				var _index = 1;
 				$('#price', $svg).children().map(function(i,e){
 					if($(e).attr('id') === undefined) return;
+					/* 
+					var x = [586,542,345,96,168,198];
 					if(type == 'enter') {
 						var x = [586,542,345,96,168,198];
 						$('#price > text > tspan', $svg).text('Enter to Win!');
 						$('#price > text > tspan', $svg).attr('x', x[tplIndex-1]);
+					}
+					*/
+					if(type == 'enter') {
+						$('#price .prize-description', $svg).text('Enter to Win!');
 					}
 					$(e).attr('id', function(index, id){
 						return id.replace(/(\d+)/, function(fullMatch, n) {
